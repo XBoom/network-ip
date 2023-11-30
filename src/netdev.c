@@ -26,10 +26,26 @@ void netdev_init(netdev *dev, char *addr, char *hwaddr)
         exit(1);
     }
 
+    //将字符串hwaddr 中的十六进制解析并存储到dev->hwaddr数组中
     sscanf(hwaddr, "%hhx:%hhx:%hhx:%hhx:%hhx:%hhx", &dev->hwaddr[0],
            &dev->hwaddr[1],
            &dev->hwaddr[2],
            &dev->hwaddr[3],
            &dev->hwaddr[4],
            &dev->hwaddr[5]);
+}
+
+//虚拟设备传输
+void netdev_transmit(netdev *dev, eth_hdr *hdr, 
+                     uint16_t ethertype, int len, unsigned char *dst)
+{
+    //主机字节序转为网络字节序 htons 将16位主机字节序转为网络字节序
+    hdr->ethertype = htons(ethertype);
+
+    memcpy(hdr->smac, dev->hwaddr, 6);
+    memcpy(hdr->dmac, dst, 6);
+
+    len += sizeof(eth_hdr);
+
+    tun_write((char *)hdr, len);
 }
