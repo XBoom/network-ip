@@ -1,6 +1,4 @@
-/*
-    以太网帧的转换
-*/
+// 以太网帧的转换
 #include "syshead.h"
 #include "basic.h"
 #include "ethernet.h"

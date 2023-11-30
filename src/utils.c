@@ -1,20 +1,25 @@
+/*
+    工具
+*/
 #include "syshead.h"
 #include "utils.h"
 
+//run_cmd 执行命令
 int run_cmd(char *cmd, ...)
 {
-    va_list ap;
-    char buf[CMDBUFLEN];
-    va_start(ap, cmd);
-    vsnprintf(buf, CMDBUFLEN, cmd, ap);
 
-    va_end(ap);
+    va_list ap; //可以在函数内容访问可变参数列表中的参数
+    char buf[CMDBUFLEN];
+    va_start(ap, cmd);  //ap初始化为可变参数的起始位置
+    vsnprintf(buf, CMDBUFLEN, cmd, ap);  //格式化可变参数
+    va_end(ap);     //清理 va_list
 
     printf("%s\n", buf);
 
-    return system(buf);
+    return system(buf); //执行命令
 }
 
+//打印字符串的16进制
 void print_hexdump(char *str, int len)
 {
     printf("Printing hexdump:\n");
@@ -26,6 +31,7 @@ void print_hexdump(char *str, int len)
     printf("\n");
 }
 
+//打印错误
 void print_error(char *str, ...)
 {
     va_list ap;
