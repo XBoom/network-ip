@@ -13,10 +13,10 @@ static int set_if_route(char *dev, char *cidr)
 }
 
 //设置地址
-static int set_if_address(char *dev, char *cidr)
-{
-    return run_cmd("ip route add dev %s local %s", dev, cidr);
-}
+// static int set_if_address(char *dev, char *cidr)
+// {
+//     return run_cmd("ip route add dev %s local %s", dev, cidr);
+// }
 
 //设置接口为启用状态
 static int set_if_up(char *dev)
@@ -46,7 +46,7 @@ static int tun_alloc(char *dev)
     ifr.ifr_flags = IFF_TAP | IFF_NO_PI;
     if (*dev)
     {
-        strncpy(ifr.ifr_name, dev, IF_NAME_SIZE);
+        strncpy(ifr.ifr_name, dev, IFNAMSIZ);   //最大长度 16 IFNAMSIZ
     }
 
     if ((err = ioctl(fd, TUNSETIFF, (void *)&ifr)) < 0)

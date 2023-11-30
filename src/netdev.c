@@ -36,14 +36,21 @@ void netdev_init(netdev *dev, char *addr, char *hwaddr)
 }
 
 //虚拟设备传输
+/**
+ * dev 虚拟网络设备信息(ip、 mac)
+ * hdr 二层数据帧
+ * ethertype 以太网类型
+ * len 负载藏都
+ * dst 目的 mac
+*/
 void netdev_transmit(netdev *dev, eth_hdr *hdr, 
                      uint16_t ethertype, int len, unsigned char *dst)
 {
     //主机字节序转为网络字节序 htons 将16位主机字节序转为网络字节序
     hdr->ethertype = htons(ethertype);
 
-    memcpy(hdr->smac, dev->hwaddr, 6);
-    memcpy(hdr->dmac, dst, 6);
+    memcpy(hdr->smac, dev->hwaddr, 6);   //设置源 mac 地址
+    memcpy(hdr->dmac, dst, 6);           //地址目的 mac 地址
 
     len += sizeof(eth_hdr);
 

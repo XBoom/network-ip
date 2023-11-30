@@ -48,6 +48,6 @@ int main(int argc, char** argv)
 
         eth_hdr *hdr = init_eth_hdr(buf);
 
-        handle_frame(&netdev, hdr);
+        handle_frame(&dev, hdr);
     }
 }

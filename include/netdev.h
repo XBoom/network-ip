@@ -1,5 +1,7 @@
 #ifndef NETDEV_H
 #define NETDEV_H
+#include "syshead.h"
+#include "ethernet.h"
 
 typedef struct netdev
 {
