@@ -51,4 +51,5 @@ uint16_t checksum(void *addr, int count, int start_sum)
      *         beginning at location "addr".
      * Taken from https://tools.ietf.org/html/rfc1071
      */
+    return 0;
 }

@@ -15,6 +15,7 @@ void handle_frame(netdev *netdev, eth_hdr* hdr)
     switch(hdr->ethertype)
     {
         case ETH_P_ARP:
+            printf("found ARP\n");
             break;
         case ETH_P_IP:
             printf("found ipv4\n");
@@ -27,15 +28,15 @@ void handle_frame(netdev *netdev, eth_hdr* hdr)
 int main(int argc, char** argv)
 {
     char buf[BUF_LEN];
-    char dev_name[10] = {0};
     netdev dev;
 
     CLEAR(buf);
 
-    tun_init(dev_name);
-    netdev_init(&dev, "10.10.0.4", "00:0c:29:6d:50:25");
+    tun_init(); //分配一个虚拟接口
 
-    arp_init();
+    netdev_init(&dev, "10.10.0.4", "00:0c:29:6d:50:25");    //解析地址信息到 dev 结构体中
+
+    arp_init(); //初始化 arp 逻辑
 
     while(1) 
     {
@@ -44,8 +45,7 @@ int main(int argc, char** argv)
             print_error("read from tun_fd: %s\n", strerror(errno));
         }
 
-        print_hexdump(buf, BUF_LEN);
-
+        //print_hexdump(buf, BUF_LEN);
         eth_hdr *hdr = init_eth_hdr(buf);
 
         handle_frame(&dev, hdr);

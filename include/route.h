@@ -2,6 +2,7 @@
 #define __ROUTE_H__
 
 #include "list.h"
+#include "netdev.h"
 
 #define RT_LOOPBACK 0x01
 #define RT_GATEWAY 0x02

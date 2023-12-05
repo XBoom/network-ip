@@ -13,5 +13,6 @@ typedef struct eth_hdr
 }__attribute__((packed)) eth_hdr;
 
 eth_hdr *init_eth_hdr(char *buf);
+void show_eth_hdr(eth_hdr *hdr);
 
 #endif

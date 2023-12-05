@@ -1,4 +1,4 @@
-CPPFLAGS = -I include -Wall
+CPPFLAGS = -I include -Wall -g -O0
 
 src = $(wildcard src/*.c)
 obj = $(patsubst src/%.c, build/%.o, $(src))
