@@ -1,5 +1,11 @@
 #include "arp.h"
 #include "netdev.h"
+#include "skbuf.h"
+#include "list.h"
+
+/*
+ * https://tools.ietf.org/html/rfc826
+ */
 
 //全局缓存
 static arp_cache_entry arp_cache[ARP_CACHE_LEN];
