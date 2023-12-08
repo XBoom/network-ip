@@ -14,11 +14,10 @@
 // 插入
 #define _UEV_INSERT(node, list) \
     do                          \
-    {       \
-    }while (0) 
-    
+    {                           \
+    } while (0)
 
-// 删除 TODO 
+// 删除 TODO
 
 // 事件类型
 typedef enum
@@ -39,40 +38,40 @@ typedef struct uev_ctx_st
     uint8_t running;     // 运行状态
     int fd;              // epoll句柄
     uint32_t max_events; // epoll 最大时间数量
-    
+    uev_st *watchers;
+    uint32_t workaround; /* For workarounds, e.g. redirected stdin */
 } uev_ctx_st;
 
-//使用宏定义用于隐藏私有数据成员
-#define uev_private_st  \
-    uev_st *next, *prev;    \
-    int active; \
-    int events; \
+// 使用宏定义用于隐藏私有数据成员
+#define uev_private_st   \
+    uev_st *next, *prev; \
+    int active;          \
+    int events;
 
-    void (*cb)(uev_st *, void *, int);  \
-    void *args; \
+void (*cb)(uev_st *, void *, int);
+void *args;
 
-    union       \
-    {               \
-        /* Cron watchers */ \
-        struct  \
-        {   \
-            time_t when;    \
-        }c; \
+union
+{ /* Cron watchers */
+    struct
+    {
+        time_t when;
+    } c;
 
-        /* Timer watchers, time in milliseconds */  \
-        struct  \
-        {   \
-            int timeout;    \
-            int period; \
-        }t; \
-    }u; \
-    // Watcher type
-    uev_type_t  
-    
-//TODO 下面函数啥意思
-int _uev_watcher_init(uev_ctx_st *ctx, uev_st *w, uev_type_t type,
-			void (*cb)(uev_st *, void *, int), void *data,
-			int fd, int events);
+    /* Timer watchers, time in milliseconds */
+    struct
+    {
+        int timeout;
+        int period;
+    } t;
+} u; // Watcher type
+uev_type_t
+
+    // TODO 下面函数啥意思
+    int
+    _uev_watcher_init(uev_ctx_st *ctx, uev_st *w, uev_type_t type,
+                      void (*cb)(uev_st *, void *, int), void *data,
+                      int fd, int events);
 int _uev_watcher_start(uev_st *w);
 int _uev_watcher_stop(uev_st *w);
 int _uev_watcher_active(uev_st *w);

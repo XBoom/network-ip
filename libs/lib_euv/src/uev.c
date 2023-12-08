@@ -116,8 +116,23 @@ int _uev_watcher_start(uev_st *w)
     {
         if(errno != EPERM) return -1;
 
-        //为什么这两个要退出
+        //TODO 为什么这两个要退出
         if (w->type != UEV_IO_TYPE || w->events != UEV_READ)
 			return -1;
+
+        //STDIN_FILENO 通常定义在头文件 unistd.h 中。它表示标准输入流的文件描述符
+        //UNIX 系统中，0、1、2 分别对应标准输入、标准输出和标准错误输出
+        // TODO 为什么这里不是输入就退出？
+        if(w->fd != STDIN_FILENO)
+            return -1;
+        
+        w->ctx->workaround = 1;
+        w->active = -1; 
+    } else {
+        w->active = 1;
     }
+
+    _UEV_INSERT(w, w->ctx->watchers);
+
+    return 0;
 }
