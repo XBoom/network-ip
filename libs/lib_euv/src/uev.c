@@ -1,11 +1,3 @@
-/*
- * @Author: Yuan Kang 728081687@qq.com
- * @Date: 2023-12-07 22:30:46
- * @LastEditors: Yuan Kang 728081687@qq.com
- * @LastEditTime: 2023-12-07 22:56:19
- * @FilePath: \network-ip\libs\lib_euv\src\uev.c
- * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
- */
 #include <errno.h>
 #include <fcntl.h>		/* O_CLOEXEC */
 #include <string.h>		/* memset() */
@@ -74,7 +66,7 @@ static int has_data(int fd)
 }
 
 //事件观察者初始化
-int _uev_watcher_init(uev_ctx_st *ctx, uev_t *w, uev_type_t type, uev_cb_t *cb, void * data, int fd, int events)
+int _uev_watcher_init(uev_ctx_st *ctx, uev_st *w, uev_type_t type, uev_cb_t *cb, void * data, int fd, int events)
 {
     if(NULL == ctx || NULL = w) 
     {
@@ -93,7 +85,39 @@ int _uev_watcher_init(uev_ctx_st *ctx, uev_t *w, uev_type_t type, uev_cb_t *cb, 
     return 0;
 }
 
-int _uev_watcher_start(uev_t *w)
+int _uev_watcher_active(uev_st *w)
+{
+	if (!w)
+		return 0;
+
+	return w->active > 0;
+}
+
+int _uev_watcher_start(uev_st *w)
 {   
-    struct epoll_event ev;
+    struct epoll_event ev;  //TODO 具体实现
+
+    if(!w || w->fd < 0 || !w->ctx)
+    {
+        errno = EINVAL;
+        return -1;
+    }
+
+    if (_uev_watcher_active(w)) //如果已经开始，则直接返回
+		return 0;
+    
+    //EPOLLRDHUP 如果文件描述符对应的连接被对方关闭、或者对方关闭了写操作的一端，就会触发这个事件
+    ev.events = w->events | EPOLLRDHUP; 
+    ev.data.ptr = w;
+
+    //添加事件
+    // TODO w->ctx->fd 与 w->fd 的区别
+    if(epoll_ctl(w->ctx->fd, EPOLL_CTL_ADD, w->fd, &ev) < 0)
+    {
+        if(errno != EPERM) return -1;
+
+        //为什么这两个要退出
+        if (w->type != UEV_IO_TYPE || w->events != UEV_READ)
+			return -1;
+    }
 }

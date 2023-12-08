@@ -23,7 +23,7 @@
 // 事件类型
 typedef enum
 {
-    UEB_IO_TYPE = 1, // io
+    UEV_IO_TYPE = 1, // io
     UEV_SIGNAL_TYPE, // signal
     UEV_TIMER_TYPE,  // timer
     UEV_CRON_TYPE,   // cron

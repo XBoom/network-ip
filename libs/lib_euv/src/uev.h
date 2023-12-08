@@ -52,4 +52,40 @@ typedef struct uev_st {
     struct signalfd_siginfo siginfo;   //received signal
 }uev_st;
 
+//事件回调
+typedef void (uev_cb_t)(uev_st *w, void *args, int events);
+
+//事件处理上下文
+int uev_init(uev_ctx_st *ctx);
+int uev_init1(uev_ctx_st *ctx, int max_events); //epoll使用(不过高版本也没用)
+int uev_exit(uev_ctx_st *ctx);
+int uev_run(uev_ctx_st *ctx, int flag);
+
+//IO事件
+int uev_io_init(uev_ctx_st *ctx, uev_st *w, uev_cb_t *cb, void *arg, int fd, int events);
+int uev_io_set(uev_st *w, int fd, int events);
+int uev_io_start(uev_st *w);
+int uev_io_stop(uev_st *w);
+
+//定时器
+int uev_timer_init(uev_ctx_st *ctx, uev_st *w, uev_cb_t *cb, void *arg, int timeout, int period);
+int uev_timer_set(uev_st *w, int timeout, int period);
+int uev_timer_start(uev_st *w);
+int uev_timer_stop(uev_st *w);
+
+// TODO cron 与 timer 的区别
+int uev_cron_init(uev_ctx_st *ctx, uev_st *w, uev_cb_t *cb, void *arg, time_t when, time_t interval);
+int uev_cron_set(uev_st *w, time_t when, time_t interval);
+int uev_cron_start(uev_st *w);
+int uev_cron_stop(uev_st *w);
+
+int uev_signal_init(uev_ctx_st *ctx, uev_st *w, uev_cb_t *cb, void *arg, int signo);
+int uev_signal_set(uev_st *w, int signo);
+int uev_signal_start(uev_st *w);
+int uev_signal_stop(uev_st *w);
+
+int uev_event_init(uev_ctx_st *ctx, uev_st *w, uev_cb_t *cb, void *arg);
+int uev_event_post(uev_st *w);
+int uev_event_stop(uev_st *w);
+
 #endif
