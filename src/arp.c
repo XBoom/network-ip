@@ -8,7 +8,15 @@
  */
 
 //全局缓存
-static arp_cache_entry arp_cache[ARP_CACHE_LEN];
+static uint8_t broadcat_hw[] = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
+static LIST_HEAD(arp_cache);    //一个arp_cache 的链表 取代原来的数组
+static pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
+
+//分配一个 arp 的缓冲区
+static sk_buff_st *arp_alloc_sk_buff()
+{
+    sk_buff_st *skb = alloc_skb(ETH_HDR_LEN + ARP_HDR_LEN + ARP_DATA_LEN);
+}
 
 //插入arp表
 static int insert_arp_translation_table(arp_hdr *hdr, arp_ipv4 *data)

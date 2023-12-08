@@ -59,6 +59,7 @@ static inline void list_del(struct list_head *elem)
 #define list_for_each(pos, head) \
     for(pos = (head)->next; pos != (head); pos = pos->next)
 
+//遍历每一个元素(允许在遍历过程中删除节点)
 #define list_for_each_safe(pos, p, head) \
     for(pos = (head)->next, p = pos->next; \
         pos != (head);                      \
