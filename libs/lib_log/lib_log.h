@@ -1,6 +1,9 @@
 #ifndef __LIB_LOG_H__
 #define __LIB_LOG_H__
 
+#define print_debug(str, ...)
+    printf(str" - %s:%u\n", ##__VA_ARGS__, __FILE__, __LINE__);
+
 //log_fmt_t 日志结构
 typedef struct log_fmt_t
 {
