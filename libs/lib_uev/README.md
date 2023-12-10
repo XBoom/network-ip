@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <uev/uev.h>
 
-static void cb(uev_t *w, void *arg, int events)
+static void cb(uev_t *w, void *args, int events)
 {
         if (UEV_ERROR == events) {
             puts("Problem with timer, attempting to restart.");
