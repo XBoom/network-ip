@@ -12,6 +12,17 @@ typedef struct eth_hdr
     unsigned char payload[];    //负载
 }__attribute__((packed)) eth_hdr;
 
+//从 sk_buff 从获取二层头部
+static inline struct eth_hdr *get_eth_hdr(struct sk_buff *skb)
+{
+    //head 指向的是 data 的起始地址
+    struct eth_hdr *hdr = (struct eth_hdr *)skb_head(skb);
+
+    hdr->ethertype = ntohs(hdr->ethertype);
+    
+    return hdr;
+}
+
 eth_hdr *init_eth_hdr(char *buf);
 void show_eth_hdr(eth_hdr *hdr);
 

@@ -3,13 +3,24 @@
 #include "basic.h"
 #include "ethernet.h"
 
+#define ETH_ADDR_LEN (6)
 //打印头部信息
 void show_eth_hdr(eth_hdr *hdr)
 {
     printf("eth hdr:\n");
-    printf("dmac :%s", hdr->dmac);
-    printf("smac :%s", hdr->smac);
-    printf("ethertype: %u", hdr->ethertype);
+    printf("dmac: ");
+    for (int i = 0; i < ETH_ADDR_LEN; i++) {
+        printf("%02X ", hdr->dmac[i]);
+    }
+    printf("\n");
+
+    printf("smac: ");
+    for (int i = 0; i < ETH_ADDR_LEN; i++) {
+        printf("%02X ", hdr->smac[i]);
+    }
+    printf("\n");
+
+    printf("ethertype: %04X \n", hdr->ethertype);
 }
 
 //init_eth_hdr 以太网帧头部转换

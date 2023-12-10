@@ -20,7 +20,7 @@ int main()
     struct uev_st timer;
 
     uev_init(&ctx);
-    
+
     uev_timer_init(&ctx, &timer, cb, NULL, 2 * 1000, 2*1000);
 
     return uev_run(&ctx, 0);

@@ -1,6 +1,6 @@
 #include "arp.h"
 #include "netdev.h"
-#include "skbuf.h"
+#include "skbuff.h"
 #include "list.h"
 
 /*
@@ -134,4 +134,49 @@ void arp_reply(netdev *dev, eth_hdr *hdr, arp_hdr *arp_h)
 
     len = sizeof(arp_hdr) + sizeof(arp_ipv4);
     netdev_transmit(dev, hdr, ETH_P_ARP, len, arp_d->dmac);
+}
+
+//接受 ARP
+void arp_receive(struct sk_buff * skb)
+{
+    arp_hdr *arp_h = arp_hdr_init(skb->head);
+    arp_ipv4 *arp_d;
+    netdev *dev;
+    int merge = 0;
+
+    //根据头部进行转换
+    arp_h->hwtype = ntohs(arp_h->hwtype);
+    arp_h->protype = ntohs(arp_h->protype);
+    arp_h->opcode = ntohs(arp_h->opcode);
+
+    //校验
+    if(arp_h->hwtype != ARP_ETHERNET) //0x0001
+    {
+        printf("not support hw type");
+        return;
+    }
+
+    if(arp_h->protype != ARP_IPV4) //0x0800
+    {
+        printf("not support proto type");
+        return;
+    }
+
+    arp_d = (arp_ipv4 *)arp_h->data;
+
+    arp_d->dip = ntohs(arp_d->dip);
+    arp_d->dmac = ntohs(arp_d->dmac);
+    arp_d->sip = ntohs(arp_d->sip);
+    arp_d->sip = ntohs(arp_d->sip);
+
+        //更新 arp 表
+    merge = update_arp_translation_table(arp_h, arp_d);
+
+    if(!(dev = netdev_get(arp_d->dip)))
+    {
+
+    }
+drop_skb:
+    free(skb);
+    return;
 }

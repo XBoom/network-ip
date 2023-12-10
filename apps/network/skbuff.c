@@ -2,12 +2,12 @@
 #include "skbuff.h"
 #include "list.h"
 
-sk_buff_st *allock_skb(unsigned int data_size)
+struct sk_buff *alloc_skb(unsigned int data_size)
 {
-    sk_buff_st *skb = MALLOC(sizeof(sk_buff_st));
-    memset(skb, 0, sizeof(sk_buff_st));
+    struct sk_buff *skb = calloc(1, sizeof(struct sk_buff));
+    memset(skb, 0, sizeof(struct sk_buff));
 
-    skb->data = MALLOC(sk_buff_st);
+    skb->data = calloc(1, sizeof(struct sk_buff));
     memset(skb->data, 0, data_size);
 
     skb->ref_cnt = 0;
@@ -18,20 +18,20 @@ sk_buff_st *allock_skb(unsigned int data_size)
     return skb;
 }
 
-//释放sk_buff_st对象
-void free_sk_buff(sk_buff_st *skb)
+//释放struct sk_buff对象
+void free_skb(struct sk_buff *skb)
 {
     if(NULL == skb) return;
 
     if(skb->ref_cnt < 1)
     {
-        FREE(skb->head);    //data
+        free(skb->head);    //data
         skb->head = NULL;
-        FREE(skb);
+        free(skb);
     }
 }
 
-void *sk_buff_reserve(sk_buff_st *skb, unsigned int len)
+void *skb_reserve(struct sk_buff *skb, unsigned int len)
 {
     if(NULL == skb || len == 0) return skb;
 
@@ -39,9 +39,9 @@ void *sk_buff_reserve(sk_buff_st *skb, unsigned int len)
     return skb->data;
 }
 
-uint8_t *sk_buff_push(sk_buff_st *skb, unsigned int len)
+uint8_t *skb_push(struct sk_buff *skb, unsigned int len)
 {
-    if(NULL == skb || len == 0) return skb;
+    if(NULL == skb || len == 0) return skb->data;
 
     skb->data -= len;
     skb->len += len;
@@ -49,14 +49,14 @@ uint8_t *sk_buff_push(sk_buff_st *skb, unsigned int len)
     return skb->data;
 }
 
-uint8_t *sk_buff_head(sk_buff_st *skb)
+uint8_t *skb_head(struct sk_buff *skb)
 {
-    if(NULL == skb) return skb;
+    if(NULL == skb) return NULL;
 
     return skb->head;
 }
 
-void sk_buff_header(sk_buff_st *skb)
+void skb_header(struct sk_buff *skb)
 {
     skb->data = skb->end - skb->dlen;
     skb->len = skb->dlen;

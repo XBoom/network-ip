@@ -10,7 +10,7 @@
 #include "uev.h"
 
 /**
- * @brief 事件上下文初始化
+ * @brief 事件上下文初始化(构建 epoll 实例)
  * @param
  *  uev_ctx_st *ctx 事件上下文
  *  int close_old 是否关闭旧的

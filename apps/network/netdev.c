@@ -4,6 +4,9 @@
 #include "tuntap_if.h"
 #include "basic.h"
 
+netdev *loop;
+netdev *cur_netdev;
+
 //网络设备初始化
 void netdev_init(netdev *dev, char *addr, char *hwaddr)
 {
@@ -56,3 +59,34 @@ void netdev_transmit(netdev *dev, eth_hdr *hdr,
 
     tun_write((char *)hdr, len);
 }
+
+//接受虚拟设备报文
+static int netdev_receive(struct sk_buff *skb)
+{
+    struct eth_hdr *hdr = get_eth_hdr(skb);   
+    show_eth_hdr(hdr);
+    switch(hdr->ethertype)
+    {
+        case ETH_P_ARP: //0x0806
+            printf("found ARP \n");
+            break;
+        case ETH_P_IP:  //0x0800
+            printf("found ipv4");
+            break;
+        case ETH_P_IPV6:    //TODO 
+        default
+            printf("unrecognized ethertype %04x \n", hdr->ethertype);
+            free_skb(skb);
+    } 
+}
+
+//根据 IP 地址获取网络设备
+netdev *netdev_get(uint32_t sip)
+{
+    if(cur_netdev->addr == sip)
+    {
+        return cur_netdev; 
+    }
+    return NULL;
+}
+

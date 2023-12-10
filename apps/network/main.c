@@ -11,13 +11,13 @@
 //处理二层帧 
 void handle_frame(netdev *netdev, eth_hdr* hdr)
 {
-    printf("recv frame type %x", hdr->ethertype);
+    printf("recv frame type %04x \n", hdr->ethertype);
     switch(hdr->ethertype)
     {
-        case ETH_P_ARP:
+        case ETH_P_ARP: //0x0806
             printf("found ARP\n");
             break;
-        case ETH_P_IP:
+        case ETH_P_IP:  //0x0800
             printf("found ipv4\n");
             break;
         default:
@@ -40,14 +40,19 @@ int main(int argc, char** argv)
 
     while(1) 
     {
-        if(tun_read(buf, BUF_LEN) < 0)
+        //这里是固定读取了 BUF_LEN 长度的报文
+        struct sk_buff *skb = alloc_skb(BUF_LEN);    //分配一个 sk_buff,用来存储读到的数据
+        if(tun_read((char *)skb->data, BUF_LEN) < 0)
         {
             print_error("read from tun_fd: %s\n", strerror(errno));
+            free(skb);
+            return NULL;
         }
 
+        netdev_receive(skb);
         //print_hexdump(buf, BUF_LEN);
-        eth_hdr *hdr = init_eth_hdr(buf);
+        //eth_hdr *hdr = init_eth_hdr(buf);
 
-        handle_frame(&dev, hdr);
+        //handle_frame(&dev, hdr);
     }
 }

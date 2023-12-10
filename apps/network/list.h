@@ -29,7 +29,7 @@ static inline void list_add(struct list_head *elem, struct list_head *head)
 }
 
 //链表头添加节点 add->head->....
-static inline void list_tail(struct list_head *elem, struct list_head *head)
+static inline void list_add_tail(struct list_head *elem, struct list_head *head)
 {
     head->prev->next = elem;
     elem->prev = head->prev;
@@ -48,7 +48,7 @@ static inline void list_del(struct list_head *elem)
 }
 
 //获取元素
-#define list_entry(prt, type, member) \
+#define list_entry(ptr, type, member) \
     ((type *)((char *)(ptr) - offsetof(type, member)))
 
 //获取第一个元素

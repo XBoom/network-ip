@@ -7,7 +7,7 @@ typedef struct netdev
 {
     uint32_t addr;           // IP地址
     unsigned char hwaddr[6]; // mac地址
-} netdev;
+}netdev;
 
 void netdev_init(netdev *dev, char *addr, char *hwaddr);
 

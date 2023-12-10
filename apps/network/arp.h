@@ -54,6 +54,12 @@ typedef struct arp_ipv4
     uint32_t dip;           //表示ARP请求或响应的目标网络层地址
 }__attribute__((packed)) arp_ipv4;
 
+void show_arp_ipv4(struct arp_ipv4 * arp_d)
+{
+    printf("sip:%s, smac:%u, dip:%s, dmac:%u \n", 
+        arp_d->sip, arp_d->smac, arp_d->dip, arp_d->dmac);
+}
+
 //ARP缓存
 typedef struct arp_cache_entry
 {
@@ -63,8 +69,15 @@ typedef struct arp_cache_entry
     unsigned int state;
 }arp_cache_entry;
 
+//ETH_HDR + ARP_HDR + data
+static inline struct arp_hdr *arp_hdr_init(struct sk_buff *skb)
+{
+    return (struct arp_hdr *)(skb->head + ETH_HDR_LEN);
+}
+
 void arp_init();
 void arp_incoming(struct netdev *netdev, struct eth_hdr *hdr);
 void arp_reply(struct netdev *netdev, struct eth_hdr *hdr, struct arp_hdr *arphdr);
+
 
 #endif
