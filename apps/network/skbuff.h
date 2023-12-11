@@ -4,14 +4,14 @@
 #include "netdev.h"
 #include "route.h"
 #include "list.h"
-#include <pthread.h>
+#include "ethernet.h"
 
 //sk_buff 数据节点
 struct sk_buff
 {
     struct list_head list; 
     rt_entry *rt;       //路由
-    netdev *dev;        //虚拟网络设备
+    struct netdev *dev;        //虚拟网络设备
     int ref_cnt;         //用于引用计数
     uint16_t protocol;
     uint32_t len;
@@ -25,14 +25,14 @@ struct sk_buff
 };
 
 //sk_buff 头部节点
-typedef struct sk_buff_head{
+struct sk_buff_head{
     struct list_head head;  // sk_buff 双向链表
 
     uint32_t qlen;  //链表长度
-}sk_buff_head;
+};
 
 struct sk_buff *alloc_skb(unsigned int data_size);
-void free_sk_buff(struct sk_buff *skb);
+void free_skb(struct sk_buff *skb);
 uint8_t *skb_push(struct sk_buff *skb, unsigned int len);
 uint8_t *skb_head(struct sk_buff *skb);
 void *skb_reserve(struct sk_buff *skb, unsigned int len);

@@ -58,7 +58,7 @@ uint8_t *skb_head(struct sk_buff *skb)
     return skb->head;
 }
 
-void skb_header(struct sk_buff *skb)
+void skb_reset_header(struct sk_buff *skb)
 {
     skb->data = skb->end - skb->dlen;
     skb->len = skb->dlen;

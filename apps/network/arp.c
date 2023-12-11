@@ -11,7 +11,7 @@
 static arp_cache_entry arp_cache[ARP_CACHE_LEN];
 
 //插入arp表
-static int insert_arp_translation_table(arp_hdr *hdr, arp_ipv4 *data)
+static int insert_arp_translation_table(struct arp_hdr *hdr, struct arp_ipv4 *data)
 {
     arp_cache_entry *entry;
     for(int i = 0; i < ARP_CACHE_LEN; i++)
@@ -33,7 +33,7 @@ static int insert_arp_translation_table(arp_hdr *hdr, arp_ipv4 *data)
 }
 
 // 更新 arp 表
-static int update_arp_translation_table(arp_hdr *hdr, arp_ipv4 *data)
+static int update_arp_translation_table(struct arp_hdr *hdr, struct arp_ipv4 *data)
 {
     arp_cache_entry *entry;
     for(int i = 0; i < ARP_CACHE_LEN; i++)
@@ -57,70 +57,12 @@ void arp_init()
     memset(arp_cache, 0, ARP_CACHE_LEN * sizeof(arp_cache_entry));
 }
 
-//接收 ARP
-void arp_incoming(netdev *dev, eth_hdr *hdr)
-{
-    arp_hdr *arp_h;
-    arp_ipv4 *arp_d;
-    int merge = 0;
-
-    //由于是((pack)),直接进行转换
-    arp_h = (arp_hdr *) hdr->payload;
-
-    //网络字节序转为本地字节序(16bit)
-    arp_h->hwtype = ntohs(arp_h->hwtype);
-    arp_h->protype = ntohs(arp_h->protype);
-    arp_h->opcode = ntohs(arp_h->opcode);
-
-    if(arp_h->hwtype != ARP_ETHERNET)
-    {
-        printf("not support hw type \n");
-        return;
-    }
-
-    if(arp_h->protype != ARP_IPV4)
-    {
-        printf("not support hw type \n");
-        return;
-    }
-
-    //直接将 body 转换
-    arp_d = (arp_ipv4 *)arp_h->data;
-
-
-    //更新 arp 表
-    merge = update_arp_translation_table(arp_h, arp_d);
-
-    //如何设备的 ip 地址，与 ARP 请求的 mac 地址不一致，则表示 arp 不是这个接口的
-    if(dev->addr != arp_d->dip)
-    {
-        printf("arp was not for us \n");
-    }
-
-    //如果是新的则插入
-    if(!merge && insert_arp_translation_table(arp_h, arp_d) != 0)
-    {
-        perror("no free space in arp translation table \n");
-    }
-
-    //根据 arp 类型处理
-    switch (arp_h->opcode)
-    {
-    case ARP_REQUEST:
-        arp_reply(dev, hdr, arp_h);
-        break;
-    default:
-        printf("opcode[%x] not supported \n", arp_h->opcode);
-        break;
-    }
-}
-
 /**
  * 响应ARP请求
  * skb ARP 请求报文
  * dev 网络设备
 */
-void arp_reply(struct sk_buff *skb, netdev *dev)
+void arp_reply(struct sk_buff *skb, struct netdev *dev)
 {
     struct arp_ipv4 *arp_d;
     struct arp_hdr *arp_h;
@@ -149,17 +91,17 @@ void arp_reply(struct sk_buff *skb, netdev *dev)
 
     skb->dev = dev; //指定发送设备
 
-    netdev_transmit(skb, arpdata->dmac, ETH_P_ARP);
+    netdev_transmit(skb, arp_d->dmac, ETH_P_ARP);
 
     free_skb(skb);
 }
 
 //接受 ARP
-void arp_receive(struct sk_buff * skb)
+void arp_receive(struct sk_buff *skb)
 {
-    arp_hdr *arp_h = arp_hdr_init(skb->head);
-    arp_ipv4 *arp_d;
-    netdev *dev;
+    struct arp_hdr *arp_h = arp_hdr_init(skb);
+    struct arp_ipv4 *arp_d;
+    struct netdev *dev;
     int merge = 0;
 
     //根据头部进行转换
@@ -180,12 +122,12 @@ void arp_receive(struct sk_buff * skb)
         return;
     }
 
-    arp_d = (arp_ipv4 *)arp_h->data;
+    arp_d = (struct arp_ipv4 *)arp_h->data;
 
-    arp_d->dip = ntohs(arp_d->dip);
-    arp_d->dmac = ntohs(arp_d->dmac);
-    arp_d->sip = ntohs(arp_d->sip);
-    arp_d->sip = ntohs(arp_d->sip);
+    //ntohl 用于将 32 位的无符号整数从网络字节顺序转换为主机字节顺序
+    //ntohs 用于将 16 位的无符号整数从网络字节顺序转换为主机字节顺序。
+    arp_d->dip = ntohl(arp_d->dip);
+    arp_d->sip = ntohl(arp_d->sip);
 
     //更新 arp 表
     merge = update_arp_translation_table(arp_h, arp_d);
@@ -204,11 +146,11 @@ void arp_receive(struct sk_buff * skb)
     switch (arp_h->opcode)
     {
         case ARP_REQUEST:   //0x0001
-            arp_reply(skb, netdev);
+            arp_reply(skb, dev);
             return;
         default:
             printf("ARP: Opcode not supported\n");
-            goto drop_pkt;
+            goto drop_skb;
     }
 drop_skb:
     free(skb);

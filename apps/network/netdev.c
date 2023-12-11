@@ -4,11 +4,11 @@
 #include "tuntap_if.h"
 #include "basic.h"
 
-netdev *loop;
-netdev *cur_netdev;
+struct netdev *loop;
+struct netdev *cur_netdev;
 
 //网络设备初始化
-void netdev_init(netdev *dev, char *addr, char *hwaddr)
+void netdev_init(struct netdev *dev, char *addr, char *hwaddr)
 {
     CLEAR(*dev);
 
@@ -92,7 +92,7 @@ static int netdev_receive(struct sk_buff *skb)
 }
 
 //根据 IP 地址获取网络设备
-netdev *netdev_get(uint32_t sip)
+struct netdev *netdev_get(uint32_t sip)
 {
     if(cur_netdev->addr == sip)
     {

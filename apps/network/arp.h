@@ -76,8 +76,7 @@ static inline struct arp_hdr *arp_hdr_init(struct sk_buff *skb)
 }
 
 void arp_init();
-void arp_incoming(struct netdev *netdev, struct eth_hdr *hdr);
-void arp_reply(struct netdev *netdev, struct eth_hdr *hdr, struct arp_hdr *arphdr);
-
+void arp_reply(struct sk_buff *skb, struct netdev *netdev);
+void arp_receive(struct sk_buff * skb);
 
 #endif

@@ -1,17 +1,16 @@
-#ifndef NETDEV_H
-#define NETDEV_H
+#ifndef __NETDEV_H__
+#define __NETDEV_H__
 #include "syshead.h"
 #include "ethernet.h"
 
-typedef struct netdev
+struct netdev
 {
     uint32_t addr;           // IP地址
     unsigned char hwaddr[6]; // mac地址
-}netdev;
+};
 
-void netdev_init(netdev *dev, char *addr, char *hwaddr);
+void netdev_init(struct netdev *dev, char *addr, char *hwaddr);
 
-void netdev_transmit(netdev *dev, eth_hdr *hdr,
-                     uint16_t ethertype, int len, unsigned char *dst);
+void netdev_transmit(struct sk_buff *skb, uint8_t *dst_hw, uint16_t ethertype);
 
 #endif

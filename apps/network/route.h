@@ -19,7 +19,7 @@ typedef struct rt_entry
     uint32_t netmask;
     uint8_t flags;
     uint32_t metric;
-    netdev *dev;        //网络虚拟设备
+    struct netdev *dev;        //网络虚拟设备
 }rt_entry;
 
 void route_init();  //路由初始化

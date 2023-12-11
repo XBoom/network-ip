@@ -8,27 +8,10 @@
 
 #define BUF_LEN 100
 
-//处理二层帧 
-void handle_frame(netdev *netdev, eth_hdr* hdr)
-{
-    printf("recv frame type %04x \n", hdr->ethertype);
-    switch(hdr->ethertype)
-    {
-        case ETH_P_ARP: //0x0806
-            printf("found ARP\n");
-            break;
-        case ETH_P_IP:  //0x0800
-            printf("found ipv4\n");
-            break;
-        default:
-            printf("unrecognized ethertype %x \n", hdr->ethertype);
-    }
-}
-
 int main(int argc, char** argv)
 {
     char buf[BUF_LEN];
-    netdev dev;
+    struct netdev dev;
 
     CLEAR(buf);
 
@@ -50,9 +33,5 @@ int main(int argc, char** argv)
         }
 
         netdev_receive(skb);
-        //print_hexdump(buf, BUF_LEN);
-        //eth_hdr *hdr = init_eth_hdr(buf);
-
-        //handle_frame(&dev, hdr);
     }
 }
