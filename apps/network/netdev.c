@@ -46,18 +46,28 @@ void netdev_init(netdev *dev, char *addr, char *hwaddr)
  * len 负载藏都
  * dst 目的 mac
 */
-void netdev_transmit(netdev *dev, eth_hdr *hdr, 
-                     uint16_t ethertype, int len, unsigned char *dst)
+void netdev_transmit(struct sk_buff *skb, uint8_t *dst_hw, uint16_t ethertype)
 {
     //主机字节序转为网络字节序 htons 将16位主机字节序转为网络字节序
+   struct netdev *dev;
+    struct eth_hdr *hdr;
+    int ret = 0;
+
+    dev = skb->dev;
+
+    skb_push(skb, ETH_HDR_LEN);
+
+    hdr = (struct eth_hdr *)skb->data;
+
+    memcpy(hdr->dmac, dst_hw, dev->addr_len);
+    memcpy(hdr->smac, dev->hwaddr, dev->addr_len);
+
     hdr->ethertype = htons(ethertype);
+    eth_dbg("out", hdr);
 
-    memcpy(hdr->smac, dev->hwaddr, 6);   //设置源 mac 地址
-    memcpy(hdr->dmac, dst, 6);           //地址目的 mac 地址
+    ret = tun_write((char *)skb->data, skb->len);
 
-    len += sizeof(eth_hdr);
-
-    tun_write((char *)hdr, len);
+    return ret;
 }
 
 //接受虚拟设备报文
@@ -69,6 +79,7 @@ static int netdev_receive(struct sk_buff *skb)
     {
         case ETH_P_ARP: //0x0806
             printf("found ARP \n");
+            arp_receive(skb);
             break;
         case ETH_P_IP:  //0x0800
             printf("found ipv4");

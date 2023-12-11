@@ -115,25 +115,43 @@ void arp_incoming(netdev *dev, eth_hdr *hdr)
     }
 }
 
-void arp_reply(netdev *dev, eth_hdr *hdr, arp_hdr *arp_h)
+/**
+ * 响应ARP请求
+ * skb ARP 请求报文
+ * dev 网络设备
+*/
+void arp_reply(struct sk_buff *skb, netdev *dev)
 {
-    arp_ipv4 *arp_d;
-    int len;
+    struct arp_ipv4 *arp_d;
+    struct arp_hdr *arp_h;
+
+    arp_h = arp_hdr_init(skb);  //获取arp 请求头
+    
+    // TODO 
+    skb_reserve(skb, ETH_HDR_LEN + ARP_HDR_LEN + ARP_DATA_LEN);
+    skb_push(skb, ARP_HDR_LEN + ARP_DATA_LEN);
 
     //设置 arp 响应
-    arp_d = (arp_ipv4 *) arp_h->data;
+    arp_d = (struct arp_ipv4 *)arp_h->data;
+
+    //目的设备
     memcpy(arp_d->dmac, arp_d->smac, 6);
     arp_d->dip = arp_d->sip;
-    memcpy(arp_d->smac, dev->hwaddr, 6);
-    arp_d->sip = dev->addr;
+
+    //来源设备
+    memcpy(arp_d->smac, arp_d->dmac, 6);
+    arp_d->sip = arp_d->dip;
 
     arp_h->opcode = ARP_REPLY;
     arp_h->opcode = htons(arp_h->opcode);
     arp_h->hwtype = htons(arp_h->hwtype);
     arp_h->protype= htons(arp_h->protype);
 
-    len = sizeof(arp_hdr) + sizeof(arp_ipv4);
-    netdev_transmit(dev, hdr, ETH_P_ARP, len, arp_d->dmac);
+    skb->dev = dev; //指定发送设备
+
+    netdev_transmit(skb, arpdata->dmac, ETH_P_ARP);
+
+    free_skb(skb);
 }
 
 //接受 ARP
@@ -169,12 +187,28 @@ void arp_receive(struct sk_buff * skb)
     arp_d->sip = ntohs(arp_d->sip);
     arp_d->sip = ntohs(arp_d->sip);
 
-        //更新 arp 表
+    //更新 arp 表
     merge = update_arp_translation_table(arp_h, arp_d);
 
-    if(!(dev = netdev_get(arp_d->dip)))
-    {
+    // if(!(dev = netdev_get(arp_d->dip)))
+    // {
 
+    // }
+
+    if(!merge && insert_arp_translation_table(arp_h, arp_d) != 0)
+    {
+        printf("ERR: No free space in ARP translation table\n");
+        goto drop_skb;
+    }
+
+    switch (arp_h->opcode)
+    {
+        case ARP_REQUEST:   //0x0001
+            arp_reply(skb, netdev);
+            return;
+        default:
+            printf("ARP: Opcode not supported\n");
+            goto drop_pkt;
     }
 drop_skb:
     free(skb);

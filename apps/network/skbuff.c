@@ -2,17 +2,19 @@
 #include "skbuff.h"
 #include "list.h"
 
+//分配一个帧缓存区
 struct sk_buff *alloc_skb(unsigned int data_size)
 {
-    struct sk_buff *skb = calloc(1, sizeof(struct sk_buff));
+    struct sk_buff *skb = malloc(sizeof(struct sk_buff));
     memset(skb, 0, sizeof(struct sk_buff));
 
-    skb->data = calloc(1, sizeof(struct sk_buff));
+    //分配缓存区大小
+    skb->data = malloc(data_size);
     memset(skb->data, 0, data_size);
 
-    skb->ref_cnt = 0;
-    skb->head = skb->data;
-    skb->end = skb->data + data_size;
+    skb->ref_cnt = 0;                   //引用数量为0
+    skb->head = skb->data;              //数据起始指针
+    skb->end = skb->data + data_size;   //数据结束指针
 
     list_init(&skb->list);
     return skb;
