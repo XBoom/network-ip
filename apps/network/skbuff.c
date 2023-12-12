@@ -33,14 +33,16 @@ void free_skb(struct sk_buff *skb)
     }
 }
 
+//将data指向 data 起始位置 + len，预留一部分空间
 void *skb_reserve(struct sk_buff *skb, unsigned int len)
 {
     if(NULL == skb || len == 0) return skb;
 
-    skb->data += len;
+    skb->data += len;   //预留一部分空间
     return skb->data;
 }
 
+//数据包增加，向前推进
 uint8_t *skb_push(struct sk_buff *skb, unsigned int len)
 {
     if(NULL == skb || len == 0) return skb->data;

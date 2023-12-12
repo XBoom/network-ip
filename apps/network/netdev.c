@@ -6,6 +6,7 @@
 
 struct netdev *loop;
 struct netdev *cur_netdev;
+extern int running; //是否正在运行
 
 //网络设备初始化
 void netdev_init(struct netdev *dev, char *addr, char *hwaddr)
@@ -38,6 +39,12 @@ void netdev_init(struct netdev *dev, char *addr, char *hwaddr)
            &dev->hwaddr[5]);
 }
 
+//分配一个网络设备
+netdev *netdev_alloc(char *addr, char *hwaddr, uint32_t mtu)
+{
+    return NULL;
+}
+
 //虚拟设备传输
 /**
  * dev 虚拟网络设备信息(ip、 mac)
@@ -49,12 +56,14 @@ void netdev_init(struct netdev *dev, char *addr, char *hwaddr)
 void netdev_transmit(struct sk_buff *skb, uint8_t *dst_hw, uint16_t ethertype)
 {
     //主机字节序转为网络字节序 htons 将16位主机字节序转为网络字节序
-   struct netdev *dev;
+    struct netdev *dev;
     struct eth_hdr *hdr;
     int ret = 0;
 
     dev = skb->dev;
 
+    //由于数据是 ETH_HDR_LEN + ARP_HDR + ARP_IPV4
+    //skb data指针指向 ARP_HDR
     skb_push(skb, ETH_HDR_LEN);
 
     hdr = (struct eth_hdr *)skb->data;
@@ -63,7 +72,7 @@ void netdev_transmit(struct sk_buff *skb, uint8_t *dst_hw, uint16_t ethertype)
     memcpy(hdr->smac, dev->hwaddr, dev->addr_len);
 
     hdr->ethertype = htons(ethertype);
-    eth_dbg("out", hdr);
+    show_eth_hdr(hdr);
 
     ret = tun_write((char *)skb->data, skb->len);
 
@@ -95,9 +104,31 @@ static int netdev_receive(struct sk_buff *skb)
 struct netdev *netdev_get(uint32_t sip)
 {
     if(cur_netdev->addr == sip)
-    {
         return cur_netdev; 
-    }
     return NULL;
 }
 
+void *netdev_rx_loop()
+{
+    while(running)
+    {
+        struct sk_bff *skb = alloc_skb(BUF_LEN);
+
+        if(tun_read((char *)skb->data, BUF_LEN) != 0)
+        {
+            printf("ERR: Read from tun_fd");
+            free_skb(skb);
+            return NULL;
+        }
+
+        netdev_receive(skb);
+    }
+}
+
+void free_netdev()
+{
+    if(loop)
+        free(loop);
+    if(cur_netdev)
+        free(cur_netdev);
+}
