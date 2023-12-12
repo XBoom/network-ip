@@ -17,10 +17,10 @@ uint8_t *skb_head(struct sk_buff *skb);
 struct eth_hdr
 {
     /* data */
-    unsigned char dmac[6];  //目的mac
-    unsigned char smac[6];  //来源mac
+    uint8_t dmac[6];  //目的mac
+    uint8_t smac[6];  //来源mac
     uint16_t ethertype;     //以太网类型
-    unsigned char payload[];    //负载
+    uint8_t payload[];    //负载
 }__attribute__((packed));
 
 //从 sk_buff 从获取二层头部

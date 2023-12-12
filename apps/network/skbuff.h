@@ -38,24 +38,24 @@ uint8_t *skb_head(struct sk_buff *skb);
 void *skb_reserve(struct sk_buff *skb, unsigned int len);
 void skb_reset_header(struct sk_buff *skb);
 
-static inline uint32_t sk_buff_queue_len(const sk_buff_head *list)
+static inline uint32_t sk_buff_queue_len(const struct sk_buff_head *list)
 {
     return list->qlen;
 }
 
-static inline void sk_buff_queue_init(sk_buff_head *list)
+static inline void sk_buff_queue_init(struct sk_buff_head *list)
 {
     list_init(&list->head);
     list->qlen = 0;
 }
 
-static inline void sk_buff_queue_tail(sk_buff_head *list, struct sk_buff *new)
+static inline void sk_buff_queue_tail(struct sk_buff_head *list, struct sk_buff *new)
 {
     list_add_tail(&new->list, &list->head);
     list->qlen += 1;
 }
 
-static inline struct sk_buff *sk_buff_dequeue(sk_buff_head *list)
+static inline struct sk_buff *sk_buff_dequeue(struct sk_buff_head *list)
 {
     struct sk_buff *skb = list_first_entry(&list->head, struct sk_buff, list);
     list_del(&skb->list);
@@ -64,26 +64,27 @@ static inline struct sk_buff *sk_buff_dequeue(sk_buff_head *list)
     return skb;
 }
 
-static inline int sk_buff_queue_empty(const sk_buff_head *list)
+//判断 sk buff queue 是否为空
+static inline int sk_buff_queue_empty(const struct sk_buff_head *list)
 {
     return sk_buff_queue_len(list) < 1;
 }
 
-static inline struct sk_buff *sk_buff_peek(sk_buff_head *list)
+static inline struct sk_buff *sk_buff_peek(struct sk_buff_head *list)
 {
     if (sk_buff_queue_empty(list)) return NULL;
         
     return list_first_entry(&list->head, struct sk_buff, list);
 }
 
-static inline void sk_buff_queue_free(sk_buff_head *list)
+static inline void sk_buff_queue_free(struct sk_buff_head *list)
 {
     struct sk_buff *skb = NULL;
     
     while ((skb = sk_buff_peek(list)) != NULL) {
         sk_buff_dequeue(list);
         skb->ref_cnt--;
-        free_sk_buff(skb);
+        free_skb(skb);
     }
 }
 #endif

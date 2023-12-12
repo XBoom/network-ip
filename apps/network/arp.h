@@ -14,6 +14,9 @@
 #define ARP_WAITING 1
 #define ARP_RESOLVED 2
 
+#define ARP_HDR_LEN sizeof(struct arp_hdr)  //arp 头部大小
+#define ARP_IPV4_LEN sizeof(struct arp_ipv4) //arp ipv4 数据大小
+
 //ARP 头部
 struct arp_hdr
 {
@@ -54,12 +57,6 @@ struct arp_ipv4
     uint32_t dip;           //表示ARP请求或响应的目标网络层地址
 }__attribute__((packed));
 
-void show_arp_ipv4(struct arp_ipv4 * arp_d)
-{
-    printf("sip:%s, smac:%u, dip:%s, dmac:%u \n", 
-        arp_d->sip, arp_d->smac, arp_d->dip, arp_d->dmac);
-}
-
 //ARP缓存
 typedef struct arp_cache_entry
 {
@@ -78,5 +75,6 @@ static inline struct arp_hdr *arp_hdr_init(struct sk_buff *skb)
 void arp_init();
 void arp_reply(struct sk_buff *skb, struct netdev *netdev);
 void arp_receive(struct sk_buff * skb);
+void show_arp_ipv4(struct arp_ipv4 * arp_d);
 
 #endif

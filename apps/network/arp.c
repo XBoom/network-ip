@@ -2,6 +2,7 @@
 #include "netdev.h"
 #include "skbuff.h"
 #include "list.h"
+#include "utils.h"
 
 /*
  * https://tools.ietf.org/html/rfc826
@@ -69,9 +70,11 @@ void arp_reply(struct sk_buff *skb, struct netdev *dev)
 
     arp_h = arp_hdr_init(skb);  //获取arp 请求头
     
-    // TODO 
-    skb_reserve(skb, ETH_HDR_LEN + ARP_HDR_LEN + ARP_DATA_LEN);
-    skb_push(skb, ARP_HDR_LEN + ARP_DATA_LEN);
+    // 预留ARP 数据的内容
+    skb_reserve(skb, ETH_HDR_LEN + ARP_HDR_LEN + ARP_IPV4_LEN);
+
+    // 设置 arp_hdr + arp_ipv4 的起始位置
+    skb_push(skb, ARP_HDR_LEN + ARP_IPV4_LEN);
 
     //设置 arp 响应
     arp_d = (struct arp_ipv4 *)arp_h->data;
@@ -123,19 +126,20 @@ void arp_receive(struct sk_buff *skb)
     }
 
     arp_d = (struct arp_ipv4 *)arp_h->data;
-
     //ntohl 用于将 32 位的无符号整数从网络字节顺序转换为主机字节顺序
     //ntohs 用于将 16 位的无符号整数从网络字节顺序转换为主机字节顺序。
     arp_d->dip = ntohl(arp_d->dip);
     arp_d->sip = ntohl(arp_d->sip);
+    show_arp_ipv4(arp_d);
 
     //更新 arp 表
     merge = update_arp_translation_table(arp_h, arp_d);
 
-    // if(!(dev = netdev_get(arp_d->dip)))
-    // {
-
-    // }
+    if(!(dev = netdev_get(arp_d->dip)))
+    {
+        printf("no found %u net dev", arp_d->dip);
+        goto drop_skb;
+    }
 
     if(!merge && insert_arp_translation_table(arp_h, arp_d) != 0)
     {
@@ -155,4 +159,19 @@ void arp_receive(struct sk_buff *skb)
 drop_skb:
     free(skb);
     return;
+}
+
+//显示 arp ipv4 内容
+void show_arp_ipv4(struct arp_ipv4 * arp_d)
+{
+    char src_ip[MAX_IP_LEN] = {0};
+    char dst_ip[MAX_IP_LEN] = {0};
+    char src_mac[MAX_MAC_STR_LEN] = {0};
+    char dst_mac[MAX_MAC_STR_LEN] = {0};
+    IPV4_TO_STR(arp_d->sip, src_ip);
+    IPV4_TO_STR(arp_d->dip, dst_ip);
+    MAC_16_TO_STR(arp_d->smac, src_mac);
+    MAC_16_TO_STR(arp_d->dmac, dst_mac);
+    printf("sip:%s, smac:%s, dip:%s, dmac:%s \n", 
+        src_ip, src_mac, dst_ip, dst_mac);
 }

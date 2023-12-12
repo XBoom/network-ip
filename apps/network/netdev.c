@@ -3,6 +3,7 @@
 #include "ethernet.h"
 #include "tuntap_if.h"
 #include "basic.h"
+#include "arp.h"
 
 struct netdev *loop;
 struct netdev *cur_netdev;
@@ -37,10 +38,12 @@ void netdev_init(struct netdev *dev, char *addr, char *hwaddr)
            &dev->hwaddr[3],
            &dev->hwaddr[4],
            &dev->hwaddr[5]);
+           
+    cur_netdev = dev;
 }
 
 //分配一个网络设备
-netdev *netdev_alloc(char *addr, char *hwaddr, uint32_t mtu)
+struct netdev *netdev_alloc(char *addr, char *hwaddr, uint32_t mtu)
 {
     return NULL;
 }
@@ -53,12 +56,11 @@ netdev *netdev_alloc(char *addr, char *hwaddr, uint32_t mtu)
  * len 负载藏都
  * dst 目的 mac
 */
-void netdev_transmit(struct sk_buff *skb, uint8_t *dst_hw, uint16_t ethertype)
+int netdev_transmit(struct sk_buff * skb, uint8_t *dst_hw, uint16_t ethertype)
 {
     //主机字节序转为网络字节序 htons 将16位主机字节序转为网络字节序
     struct netdev *dev;
     struct eth_hdr *hdr;
-    int ret = 0;
 
     dev = skb->dev;
 
@@ -74,47 +76,41 @@ void netdev_transmit(struct sk_buff *skb, uint8_t *dst_hw, uint16_t ethertype)
     hdr->ethertype = htons(ethertype);
     show_eth_hdr(hdr);
 
-    ret = tun_write((char *)skb->data, skb->len);
-
-    return ret;
+    return tun_write((char *)skb->data, skb->len);;
 }
 
 //接受虚拟设备报文
-static int netdev_receive(struct sk_buff *skb)
+static void netdev_receive(struct sk_buff *skb)
 {
     struct eth_hdr *hdr = get_eth_hdr(skb);   
     show_eth_hdr(hdr);
     switch(hdr->ethertype)
     {
         case ETH_P_ARP: //0x0806
-            printf("found ARP \n");
             arp_receive(skb);
             break;
         case ETH_P_IP:  //0x0800
             printf("found ipv4");
+            free_skb(skb);
             break;
         case ETH_P_IPV6:    //TODO 
-        default
+            printf("found ipv6");
+            free_skb(skb);
+            break;
+        default:
             printf("unrecognized ethertype %04x \n", hdr->ethertype);
             free_skb(skb);
     } 
 }
 
-//根据 IP 地址获取网络设备
-struct netdev *netdev_get(uint32_t sip)
-{
-    if(cur_netdev->addr == sip)
-        return cur_netdev; 
-    return NULL;
-}
-
-void *netdev_rx_loop()
+//继续读取网络包
+void* netdev_rx_loop()
 {
     while(running)
     {
-        struct sk_bff *skb = alloc_skb(BUF_LEN);
+        struct sk_buff *skb = alloc_skb(MAX_BUF_LEN);
 
-        if(tun_read((char *)skb->data, BUF_LEN) != 0)
+        if(tun_read((char *)skb->data, MAX_BUF_LEN) < 0)
         {
             printf("ERR: Read from tun_fd");
             free_skb(skb);
@@ -123,6 +119,18 @@ void *netdev_rx_loop()
 
         netdev_receive(skb);
     }
+    return NULL;
+}
+
+//根据 包的来源 ip 获取虚拟网络设备
+struct netdev* netdev_get(uint32_t sip)
+{
+    if(!cur_netdev) return NULL;
+
+    if(cur_netdev->addr == sip) 
+        return cur_netdev;
+    else 
+        return NULL;
 }
 
 void free_netdev()

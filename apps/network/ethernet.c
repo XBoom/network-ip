@@ -5,7 +5,7 @@
 
 #define ETH_ADDR_LEN (6)
 //打印头部信息
-void show_eth_hdr(eth_hdr *hdr)
+void show_eth_hdr(struct eth_hdr *hdr)
 {
     printf("eth hdr:\n");
     printf("dmac: ");
@@ -24,9 +24,9 @@ void show_eth_hdr(eth_hdr *hdr)
 }
 
 //init_eth_hdr 以太网帧头部转换
-eth_hdr *init_eth_hdr(char *buf)
+struct eth_hdr *init_eth_hdr(char *buf)
 {
-    eth_hdr *hdr = (eth_hdr *)buf;
+    struct eth_hdr *hdr = (struct eth_hdr *)buf;
     
     //主机字节序转换为网络字节序
     hdr->ethertype = htons(hdr->ethertype);
