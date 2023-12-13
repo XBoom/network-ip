@@ -14,10 +14,14 @@ typedef struct log_fmt_t
 }log_fmt_t;
 
 //输出日志
-void log_output(uint32_t to_type, uint32_t log_type, uint32_t level,
-                    const char *file, uint32_t line_no, const char *func, 
-                    const char *info, const char *fmt, ...)
+void log_output(uint32_t to_type, uint32_t log_type, 
+    uint32_t log_level, const char *info, const char *fmt, ...)
 {
+    va_list ap; //可以在函数内容访问可变参数列表中的参数
+    char buf[CMDBUFLEN];
+    va_start(ap, cmd);  //ap初始化为可变参数的起始位置
+    vsnprintf(buf, CMDBUFLEN, cmd, ap);  //格式化可变参数
+    va_end(ap);     //清理 va_list
 }
 
 //输出到tcp
@@ -38,5 +42,21 @@ void log_output(uint32_t to_type, uint32_t log_type, uint32_t level,
 
 //     //cl_tcp_syn_write(tcp, buf, strlen(buf));
 // }
+
+
+//fprintf(file_pointer, "格式化字符串", 变量1, 变量2, ...);
+//  FILE *stream：指向 FILE 对象的指针，表示要写入的文件流
+//      stdout 标准输出，这样输出就会显示在屏幕上(printf 默认)
+//      stderr 标准错误输出。它通常用于显示错误消息和诊断信息，也会显示在屏幕上
+#define LOG_INFO(fmt,...) \
+do { \
+    fprintf(stdout, "[%s:%d]"fmt"\n", \
+                                 __func__, __LINE__, ##__VA_ARGS__); \
+} while(0)
+#define LOG_ERROR(fmt,...) \
+do { \
+    fprintf(stderr, "[%s:%d]"fmt"\n", \
+                                 __func__, __LINE__, ##__VA_ARGS__); \
+} while(0)
 
 #endif

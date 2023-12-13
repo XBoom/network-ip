@@ -87,7 +87,7 @@ void arp_reply(struct sk_buff *skb, struct netdev *dev)
     memcpy(arp_d->smac, arp_d->dmac, 6);
     arp_d->sip = arp_d->dip;
 
-    arp_h->opcode = ARP_REPLY;
+    arp_h->opcode = ARP_OP_REPLY;
     arp_h->opcode = htons(arp_h->opcode);
     arp_h->hwtype = htons(arp_h->hwtype);
     arp_h->protype= htons(arp_h->protype);
@@ -149,7 +149,7 @@ void arp_receive(struct sk_buff *skb)
 
     switch (arp_h->opcode)
     {
-        case ARP_REQUEST:   //0x0001
+        case ARP_OP_REQUEST:   //0x0001
             arp_reply(skb, dev);
             return;
         default:
