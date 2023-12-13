@@ -1,10 +1,18 @@
-# network-ip
-network-ip 是使用TUN/TAP设备实现的Linux用户空间TCP/IP堆栈
+# 功能目标
 
-参考链接：https://github.com/saminiir/level-ip/tree/e9ceb08f01a5499b85f03e2d615309c655b97e8f
+### 项目目标
+学习网络编程
+1. 实现网络报文发送/接收
+2. 实现报文的过滤存储
 
+### 项目计划
+1. 服务 ARP 
+2. 公共库 - euv库
+3. 公共库 - 日志
+4. 服务 IPv4 & ICMP
+5. 实现服务管理
 
-# 项目构建
+### 项目构建
 - apps 应用程序
 - build 编译中间文件
 - include 头文件
@@ -19,3 +27,6 @@ network-ip 是使用TUN/TAP设备实现的Linux用户空间TCP/IP堆栈
   - lib_str 字符串
   - lib_telnet telnet调试功能
   - lib_uev 一个事件模型公共库
+
+### 参考链接
+1. https://github.com/saminiir/level-ip/tree/e9ceb08f01a5499b85f03e2d615309c655b97e8f
