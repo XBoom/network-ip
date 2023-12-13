@@ -1,6 +1,8 @@
 #ifndef __LIB_LOG_H__
 #define __LIB_LOG_H__
 
+#define LOG_BUFF_LEN 1024
+
 //log_fmt_t 日志结构
 typedef struct log_fmt_t
 {
@@ -17,11 +19,18 @@ typedef struct log_fmt_t
 void log_output(uint32_t to_type, uint32_t log_type, 
     uint32_t log_level, const char *info, const char *fmt, ...)
 {
-    va_list ap; //可以在函数内容访问可变参数列表中的参数
-    char buf[CMDBUFLEN];
-    va_start(ap, cmd);  //ap初始化为可变参数的起始位置
-    vsnprintf(buf, CMDBUFLEN, cmd, ap);  //格式化可变参数
-    va_end(ap);     //清理 va_list
+    va_list ap;
+    char buf[LOG_BUFF_LEN];
+    va_start(ap, fmt);
+    vsnprintf(buf, LOG_BUFF_LEN, fmt, ap);
+    va_end(ap);
+
+    // 这里你可以根据需要将日志输出到不同的地方，比如 stdout 或者 stderr
+    if (to_type == 1) {
+        fprintf(stdout, "%s \n", buf); // 输出到标准输出流
+    } else {
+        fprintf(stderr, "%s \n", buf); // 输出到标准错误流
+    }
 }
 
 //输出到tcp
