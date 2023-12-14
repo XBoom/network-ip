@@ -25,11 +25,11 @@
 // ARP 头部
 struct arp_hdr
 {
-    uint16_t hardware;     // format of hardware address
-    uint16_t protocol;      // 使用 ARP 协议的网络层协议，例如 IPv4
-    unsigned char hw_len;  // 硬件地址的长度
-    unsigned char pro_len; // 协议地址的长度
-    uint16_t opcode;       // 指定ARP请求或ARP响应等操作的类型
+    uint16_t hardware;      // 硬件类型
+    uint16_t protocol;      // 上层协议类型，例如 IPv4
+    unsigned char hw_len;   // MAC地址长度
+    unsigned char pro_len;  // 协议地址长度
+    uint16_t opcode;        // 指定ARP请求或ARP响应等操作的类型
     unsigned char data[];
 } __attribute__((packed));
 

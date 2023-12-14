@@ -44,12 +44,48 @@ void print_error(char *str, ...)
     perror(buf);
 }
 
-//校验和
+/**
+ *  计算16bit合
+ *  addr 被计算目标
+ *  count 字节数
+ * */ 
+uint32_t sum_every_16bits(void *addr, int count)
+{
+    register uint32_t sum = 0;
+    uint16_t * ptr = addr;
+
+    while(count > 1)
+    {
+        sum += * ptr++;
+        count -= 2; //因为ptr是两个字节，所以没计算一次就 -2
+    }
+
+    //如果还有一个字节，那么将这个字节也加进去
+    if(count > 0)
+        sum += * (uint8_t *)ptr;
+    
+    return sum;
+}
+
+/**
+ * 校验和
+ * addr 被计算目标
+ * count 字节数
+ * start_sumn 起始合
+*/
 uint16_t checksum(void *addr, int count, int start_sum)
 {
     /* Compute Internet Checksum for "count" bytes
      *         beginning at location "addr".
      * Taken from https://tools.ietf.org/html/rfc1071
      */
-    return 0;
+
+    uint32_t sum = start_sum;
+    sum += sum_every_16bits(addr, count);
+
+    while(sum >> 16)
+        sum = (sum & 0xffff) + (sum >> 16);
+
+    return ~sum;
+
 }
