@@ -7,8 +7,10 @@ include $(ROOTDIR)/BuildEnv.mk
 # Compiler and flags
 CFLAGS += -g -O0
 INCLUDES += -I$(ROOTDIR)/libs/lib_uev/
+INCLUDES += -I$(ROOTDIR)/libs/lib_log/
 
 LDFLAGS += -L$(ROOTDIR)/libs/lib_uev/ -l_uev
+LDFLAGS += -L$(ROOTDIR)/libs/lib_log/ -l_log
 
 # Target
 uev: main.o
