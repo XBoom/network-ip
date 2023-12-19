@@ -13,7 +13,7 @@ struct netdev;
 
 uint8_t *skb_head(struct sk_buff *skb);
 
-//二层数据
+//二层数据(传统)
 struct eth_hdr
 {
     /* data */
@@ -22,6 +22,9 @@ struct eth_hdr
     uint16_t ethertype;     //以太网类型
     uint8_t payload[];    //负载
 }__attribute__((packed));
+
+//VLAN数据帧
+
 
 //从 sk_buff 从获取二层头部
 static inline struct eth_hdr *get_eth_hdr(struct sk_buff *skb)
