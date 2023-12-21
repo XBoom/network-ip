@@ -13,7 +13,13 @@ struct netdev;
 
 uint8_t *skb_head(struct sk_buff *skb);
 
-//二层数据(传统)
+//ethertype
+// 0x0800 IP
+// 0x0806 ARP
+// 0x8035 RARP
+
+
+//二层数据(RFC 894)
 struct eth_hdr
 {
     /* data */
