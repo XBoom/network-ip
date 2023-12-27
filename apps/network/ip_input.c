@@ -6,6 +6,7 @@
 #include "tcp.h"
 #include "utils.h"
 
+//将网络字节序ip头转为本地字节序
 static void ip_init_pkt(struct ip_hdr *ip_h)
 {
     ip_h->saddr = ntohl(ip_h->saddr);
@@ -31,6 +32,12 @@ int ip_recv(struct sk_buff *skb)
     {
         print_error("Time to live of datagram reached 0\n");
         goto drop_skb;
+    }
+
+    if (ih->ttl == 0) {
+        //TODO: Send ICMP error
+        print_err("Time to live of datagram reached 0\n");
+        goto drop_pkt;
     }
 
     //校验和(合上面对应，ip_h->ihl 表示的是多少 32位)
