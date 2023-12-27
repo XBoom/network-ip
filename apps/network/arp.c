@@ -11,6 +11,14 @@
 //全局缓存
 static arp_cache_entry arp_cache[ARP_CACHE_LEN];
 
+//arp 初始化
+uint32_t arp_init()
+{
+    memset(arp_cache, 0, ARP_CACHE_LEN * sizeof(arp_cache_entry));
+    //TODO 为什么使用数组
+    return 0;
+}
+
 //插入arp表
 static int insert_arp_translation_table(struct arp_hdr *hdr, struct arp_ipv4 *data)
 {
@@ -50,12 +58,6 @@ static int update_arp_translation_table(struct arp_hdr *hdr, struct arp_ipv4 *da
         }
     }
     return 0;
-}
-
-//arp 初始化
-void arp_init()
-{
-    memset(arp_cache, 0, ARP_CACHE_LEN * sizeof(arp_cache_entry));
 }
 
 /**
