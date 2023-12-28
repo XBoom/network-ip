@@ -5,7 +5,7 @@
 #include "netdev.h"
 #include "ip.h"
 
-static LIST_HEAD(RoutingTable);   //路由表
+static LIST_HEAD(g_route_table);   //路由表
 
 //分配一条路由
 static struct rt_entry *route_alloc(uint32_t dst, uint32_t gateway, uint32_t netmask,
@@ -32,15 +32,16 @@ void route_add(uint32_t dst, uint32_t gateway, uint32_t netmask, uint8_t flags,
 {
     struct rt_entry *rt = route_alloc(dst, gateway, netmask, flags, metric, dev);
 
-    list_add_tail(&rt->list, &routes);
+    list_add_tail(&rt->list, &g_route_table);
 }
 
+//路由查找(TODO 路由匹配规则)
 struct rt_entry *route_find(uint32_t daddr)
 {
     struct list_head *item;
     struct rt_entry *rt = NULL;
 
-    list_for_each(item, &routes) {
+    list_for_each(item, &g_route_table) {
         rt = list_entry(item, struct rt_entry, list);
         if ((daddr & rt->netmask) == (rt->dst & rt->netmask)) break;
         // If no matches, we default to to default gw (last item)
@@ -50,15 +51,14 @@ struct rt_entry *route_find(uint32_t daddr)
 }
 
 //释放路由表
-void free_routes()
+void free_route_table()
 {
     struct list_head *item, *tmp;
-    struct rtentry *rt;
+    struct rt_entry *rt;
     
-    list_for_each_safe(item, tmp, &routes) {
-        rt = list_entry(item, struct rtentry, list);
+    list_for_each_safe(item, tmp, &g_route_table) {
+        rt = list_entry(item, struct rt_entry, list);
         list_del(item);
-
         free(rt);
     }
 }
