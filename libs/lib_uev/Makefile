@@ -8,7 +8,7 @@ include $(ROOTDIR)/BuildEnv.mk
 # -Wall 启用所有警告信息。
 # -g 生成包含调试信息的可执行文件，以便进行调试。
 # -O0 禁用优化，以便生成更容易调试的代码。
-CPPFLAGS = -I include -Wall -g -O0
+CFLAGS += -g -O0
 
 # 使用 wildcard 函数获取 src 目录下所有的 .c 文件的文件名。
 src = $(wildcard ./*.c)
@@ -38,12 +38,18 @@ $(SO_TARGET): $(obj)
 # 	$< 表示规则中的第一个依赖项，即源文件。
 #	-c 表示生成目标文件而不链接。
 #	-o $@ 表示输出文件的名称，即目标文件。
-build/%.o: src/%.c ${headers}
-	$(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
+# build/%.o: src/%.c ${headers}
+# 	$(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
+%.o: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+#设置默认目标，在执行 make 之后会自动执行
+.DEFAULT_GOAL := install
 
 install: $(SO_TARGET)
 # 将 .so 文件移动到指定目录
 	cp $< $(PROCESS_LIBS)/$<
 
+.PHONY: clean
 clean:
 	rm ./*.o $(SO_TARGET)

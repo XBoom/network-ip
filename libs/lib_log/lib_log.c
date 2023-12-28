@@ -8,6 +8,12 @@
 
 static uint32_t cur_debug_level = DL_1;   //当前调试日志级别
 
+//根据 log_type 获取类型字符串
+#define GET_LOG_TYPE_STR(x) \
+    ((x == LT_ERROR) ? "error" : \
+    (x == LT_WARN) ? "warn" : \
+    (x == LT_INFO) ? "info" : "debug")
+
 //输出日志
 static void write_log(uint32_t to_type, uint32_t log_type, 
     uint32_t level, const char *file, const uint32_t lineno, 
@@ -19,7 +25,7 @@ static void write_log(uint32_t to_type, uint32_t log_type,
 	if(NULL == cpy_fmt)
         return;
 	
-    sprintf(cpy_fmt, "[%s:%u %s] %s", file, lineno, func, format);
+    sprintf(cpy_fmt, "[%s:%u %s %s] %s", file, lineno, func, GET_LOG_TYPE_STR(log_type), format);
 
     char buf[LOG_BUFF_LEN];
     memset(buf, 0, LOG_BUFF_LEN);

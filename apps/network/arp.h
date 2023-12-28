@@ -57,7 +57,7 @@ static inline struct arp_hdr *arp_hdr_init(struct sk_buff *skb)
     return (struct arp_hdr *)(skb->head + ETH_HDR_LEN);
 }
 
-void arp_init();
+uint32_t arp_init();
 void arp_reply(struct sk_buff *skb, struct netdev *netdev);
 void arp_receive(struct sk_buff *skb);
 void show_arp_ipv4(struct arp_ipv4 *arp_d);

@@ -3,6 +3,24 @@
 
 #define CMDBUFLEN (100)
 
+//校验结果 如果不为 0 return,并输出错误
+#define CHECK_RET(x, fmt, output...) \
+    do{\
+        if(x) {\
+            LOG_ERROR(fmt, output);\
+            return x;\
+        }\
+    }while(0)
+
+//校验结果 如果不为 0 goto to,并输出错误
+#define CHECK_RET_GOTO(x, to, fmt, output...) \
+    do{\
+        if(x) {\
+            LOG_ERROR(fmt, output);\
+            goto to;\
+        }\
+    }while(0)
+    
 int run_cmd(char *cmd, ...);
 void print_hexdump(char *str, int len);
 void print_error(char *str, ...);

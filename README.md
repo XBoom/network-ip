@@ -28,5 +28,24 @@
   - lib_telnet telnet调试功能
   - lib_uev 一个事件模型公共库
 
+
+
+问题 1：
+
+在`gitignore`文件中添加下列忽略所有的 `.DS_Store` 文件
+
+```
+# Ignore all .DS_Store files recursively
+**/.DS_Store
+```
+
+如果你的 `.gitignore` 文件已经存在，只需在文件中添加上述规则即可。如果 `.DS_Store` 文件已经被跟踪并提交到版本控制系统，你可能还需要从版本历史中删除它们。你可以使用以下命令：
+
+
+```
+git rm --cached '**/.DS_Store'
+git commit -m "Remove all .DS_Store files from version control"
+```
+
 ### 参考链接
 1. https://github.com/saminiir/level-ip/tree/e9ceb08f01a5499b85f03e2d615309c655b97e8f

@@ -1,7 +1,8 @@
 #set environment variables for installation
 CC := gcc
-CFLAGS := -Wall -Werror
-INCLUDES := -I$(ROOTDIR)/include
+#INCLUDES := -I$(ROOTDIR)/include
+
+CFLAGS := -I$(ROOTDIR)/include -Wall -Werror -fPIC
 
 # 编译目标
 SO_TARGET := 

@@ -4,11 +4,14 @@ export ROOTDIR=$(shell while true; do if [ -f BuildEnv.mk ]; then pwd;exit; else
 endif
 include $(ROOTDIR)/BuildEnv.mk
 
+#调试查看 ROOTDIR 路径
+#$(info ROOTDIR is $(ROOTDIR))
+
 # -I include 表示将 include 目录添加到头文件搜索路径，以便编译器可以找到头文件
 # -Wall 启用所有警告信息。
 # -g 生成包含调试信息的可执行文件，以便进行调试。
 # -O0 禁用优化，以便生成更容易调试的代码。
-CPP_FLAGS = -I  $(ROOTDIR)/include -Wall -g -O0 -fPIC
+CFLAGS += -g -O0
 
 #引用库
 #LIB_FLAGS += -lcl_ev
@@ -41,12 +44,16 @@ $(SO_TARGET): $(obj)
 # 	$< 表示规则中的第一个依赖项，即源文件。
 #	-c 表示生成目标文件而不链接。
 #	-o $@ 表示输出文件的名称，即目标文件。
-build/%.o: ./%.c ${headers}
-	$(CC) $(CFLAGS) $(CPP_FLAGS) -c $< -o $@
+%.o: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+#设置默认目标，在执行 make 之后会自动执行
+.DEFAULT_GOAL := install
 
 install: $(SO_TARGET)
 # 将 .so 文件移动到指定目录
 	cp $< $(PROCESS_LIBS)/$<
 
+.PHONY: clean
 clean:
 	rm ./*.o $(SO_TARGET)
