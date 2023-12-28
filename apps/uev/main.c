@@ -1,7 +1,4 @@
-#include <stdio.h>
-
-#include "uev.h"
-#include "lib_log.h"
+#include "common.h"
 
 static void cb(struct uev_st *w, void *args, int events)
 {
