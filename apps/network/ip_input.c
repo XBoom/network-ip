@@ -24,19 +24,19 @@ int ip_recv(struct sk_buff *skb)
     //为什么它不用通过网络字节序转本地字节序(因为只有一个字节)
     if(ip_h->version != IPV4)   
     {
-        print_error("Data gram version was not IPV4 \n");
+        LOG_ERROR("Data gram version was not IPV4 \n");
         goto drop_skb;
     }
 
     if(ip_h->ihl < 5)   //为什么不能小于5，最小值为5个32位字，也就是20字节
     {
-        print_error("Time to live of datagram reached 0\n");
+        LOG_ERROR("Time to live of datagram reached 0\n");
         goto drop_skb;
     }
 
-    if (ih->ttl == 0) {
+    if (ih->ttl == 0) { //TTL TODO
         //TODO: Send ICMP error
-        print_err("Time to live of datagram reached 0\n");
+        LOG_ERROR("Time to live of datagram reached 0\n");
         goto drop_pkt;
     }
 
@@ -44,11 +44,11 @@ int ip_recv(struct sk_buff *skb)
     sum = checksum(ip_h, ip_h->ihl * 4, 0);
     if(sum != 0)
     {
-        print_error("Invalid checksum, drop packet handling \n");
+        LOG_ERROR("Invalid checksum, drop packet handling \n");
         goto drop_skb;
     }
 
-    ip_init_pkt(ip_h);
+    ip_init_pkt(ip_h);  //转换字节序(多字节)
     switch (ip_h->proto) {  //判断上层协议
     case ICMPV4:        // 0x01
         icmpv4_incoming(skb);
@@ -57,7 +57,7 @@ int ip_recv(struct sk_buff *skb)
         tcp_in(skb);
         return 0;
     default:
-        print_err("Unknown IP header proto\n");
+        LOG_ERROR("Unknown IP header proto");
         goto drop_pkt;
     }
 

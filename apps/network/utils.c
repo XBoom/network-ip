@@ -31,19 +31,6 @@ void print_hexdump(char *str, int len)
     printf("\n");
 }
 
-//打印错误
-void print_error(char *str, ...)
-{
-    va_list ap;
-    char buf[200];
-    va_start(ap, str);
-    vsnprintf(buf, 200, str, ap);
-
-    va_end(ap);
-
-    perror(buf);
-}
-
 /**
  *  计算16bit合
  *  addr 被计算目标

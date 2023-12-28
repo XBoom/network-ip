@@ -91,7 +91,7 @@ static void netdev_receive(struct sk_buff *skb)
             break;
         case ETH_P_IP:  //0x0800
             printf("found ipv4");
-            free_skb(skb);
+            ip_recv(skb);
             break;
         case ETH_P_IPV6:    //TODO 
             printf("found ipv6");
