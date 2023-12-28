@@ -41,7 +41,7 @@
 
 //Checksum 校验和
 
-struct icmp_ipv4{
+struct icmp_v4{
     uint8_t type;
     uint8_t code;
     uint16_t csum;

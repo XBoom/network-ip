@@ -6,6 +6,7 @@
 
 
 #include "lib_log.h" //自定义日志文件
+#include "list.h"    //链表
 
 #include "uev.h"    //事件驱动
 

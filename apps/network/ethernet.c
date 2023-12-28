@@ -7,20 +7,20 @@
 //打印头部信息
 void show_eth_hdr(struct eth_hdr *hdr)
 {
-    printf("eth hdr:\n");
-    printf("dmac: ");
+    LOG_DEBUG(DL_2, "eth hdr:\n");
+    LOG_DEBUG(DL_2, "dmac: ");
     for (int i = 0; i < ETH_ADDR_LEN; i++) {
-        printf("%02X ", hdr->dmac[i]);
+        LOG_DEBUG(DL_2, "%02X ", hdr->dmac[i]);
     }
-    printf("\n");
+    LOG_DEBUG(DL_2, "\n");
 
-    printf("smac: ");
+    LOG_DEBUG(DL_2, "smac: ");
     for (int i = 0; i < ETH_ADDR_LEN; i++) {
-        printf("%02X ", hdr->smac[i]);
+        LOG_DEBUG(DL_2, "%02X ", hdr->smac[i]);
     }
-    printf("\n");
+    LOG_DEBUG(DL_2, "\n");
 
-    printf("ethertype: %04X \n", hdr->ethertype);
+    LOG_DEBUG(DL_2, "ethertype: %04X \n", hdr->ethertype);
 }
 
 //init_eth_hdr 以太网帧头部转换
