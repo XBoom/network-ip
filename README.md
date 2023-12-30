@@ -5,6 +5,10 @@
 1. 实现网络报文发送/接收
 2. 实现报文的过滤存储
 
+### TODO
+1. 网络编程
+2. 数据包转发
+
 ### 项目计划
 1. 服务 ARP 
 2. 公共库 - euv库
@@ -14,6 +18,11 @@
 
 ### 项目构建
 - apps 应用程序
+  - network 数据包转发
+  - socket 网络编程
+  - tips epoll 源码阅读
+  - uev 事件魔心
+  - daemon 守护进程
 - build 编译中间文件
 - include 头文件
   - proto proto文件
@@ -27,8 +36,6 @@
   - lib_str 字符串
   - lib_telnet telnet调试功能
   - lib_uev 一个事件模型公共库
-
-
 
 问题 1：
 
