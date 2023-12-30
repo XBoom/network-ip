@@ -4,6 +4,8 @@
 #include "syshead.h"
 #include "utils.h"
 
+#define CMDBUFLEN (100)
+
 //run_cmd 执行命令
 int run_cmd(char *cmd, ...)
 {
