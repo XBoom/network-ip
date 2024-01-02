@@ -36,6 +36,8 @@
   - lib_str 字符串
   - lib_telnet telnet调试功能
   - lib_uev 一个事件模型公共库
+  - lib_xml xml读取
+    - protobuf_c proto - bin 转换
 
 问题 1：
 
