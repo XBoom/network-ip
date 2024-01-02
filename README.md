@@ -56,5 +56,8 @@ git rm --cached '**/.DS_Store'
 git commit -m "Remove all .DS_Store files from version control"
 ```
 
+
+如何在编译程序之前使用检查查看需要安装的库？
+
 ### 参考链接
 1. https://github.com/saminiir/level-ip/tree/e9ceb08f01a5499b85f03e2d615309c655b97e8f
