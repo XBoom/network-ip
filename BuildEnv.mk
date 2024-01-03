@@ -1,5 +1,6 @@
 #set environment variables for installation
 CC := gcc
+
 #INCLUDES := -I$(ROOTDIR)/include
 
 CFLAGS := -I$(ROOTDIR)/include -Wall -Werror -fPIC
@@ -13,6 +14,12 @@ PROCESS_LIBS := /home/libs/
 # 进程引用位置
 LDFLAGS := -Wl,-rpath,$(PROCESS_LIBS)
 
+
+# 定时 proto 编译器
+PROTOC := protoc
+
+# proto 位置
+PROTO_SRC_DIR := $(ROOTDIR)/include/proto
 
 # ifdef COMENT
 # $^ 表示规则的所有先决条件（依赖项）,用于指定用于构建目标的所有源文件或依赖项。
