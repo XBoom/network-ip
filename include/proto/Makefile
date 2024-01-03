@@ -27,7 +27,9 @@ CONF_H_FILES := $(patsubst $(PROTO_SRC_DIR)/confproto/%.proto,$(CONF_OUTPUT_DIR)
 MSG_C_FILES := $(patsubst $(PROTO_SRC_DIR)/msgproto/%.proto,$(MSG_OUTPUT_DIR)/%.pb-c.c,$(MSG_PROTO_FILES))
 MSG_H_FILES := $(patsubst $(PROTO_SRC_DIR)/msgproto/%.proto,$(MSG_OUTPUT_DIR)/%.pb-c.h,$(MSG_PROTO_FILES))
 
-
+.PHONY: proto
+proto:
+# 执行命令即可
 # Define the rule to generate C files from proto files
 $(CONF_OUTPUT_DIR)/%.pb-c.c $(CONF_OUTPUT_DIR)/%.pb-c.h: $(PROTO_SRC_DIR)/confproto/%.proto
 	@mkdir -p $(CONF_OUTPUT_DIR)

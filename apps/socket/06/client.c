@@ -1,5 +1,7 @@
 #include "common.h"
 
+#define MAX_BUFF_LEN (1024)
+
 int main(int argc, char *argv[])
 {
     CHECK_RET(argc != 3, "Usage: client <ip> <port>");
@@ -22,7 +24,16 @@ int main(int argc, char *argv[])
     ret = connect(client_sock, (const sturct sockaddr *)&server_addr, sizeof(server_addr));
     CHECK_RET(ret == -1, "connect failed");
 
-    
+    while(1)    
+    {
+        char message[MAX_BUF_LEN] = "client message";
+        ret = write(client_sock, message, strlen(message));
+        CHECK_RET(ret = -1, "write failed");
 
+        char reponse[MAX_BUFF_LEN] = {0};
+        ret = read(client_sock, &reponse, MAX_BUFF_LEN);
+        CHECK_RET(ret == -1, "read failed");
+    }
+    close(client_sock);
     return 0;
 }
