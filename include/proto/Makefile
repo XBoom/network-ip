@@ -5,11 +5,10 @@ export ROOTDIR=$(shell while true; do if [ -f BuildEnv.mk ]; then pwd;exit; else
 endif
 include $(ROOTDIR)/BuildEnv.mk
 
-# Define the output directories
+# 定义 proto编译的输出位置
 CONF_OUTPUT_DIR := $(PROTO_SRC_DIR)/conf
 MSG_OUTPUT_DIR := $(PROTO_SRC_DIR)/msg
 
-# 定义 proto编译的输出位置
 CONF_PROTOC_FLAGS := --c_out=$(CONF_OUTPUT_DIR)
 MSG_PROTOC_FLAGS := --c_out=$(MSG_OUTPUT_DIR)
 
@@ -21,14 +20,16 @@ MSG_PROTO_FILES := $(wildcard $(PROTO_SRC_DIR)/msgproto/*.proto)
 # $(info CONF_PROTO_FILES: $(CONF_PROTO_FILES))
 
 # Define the output C files
-CONF_C_FILES := $(patsubst $(PROTO_SRC_DIR)/confproto/%.proto,$(CONF_OUTPUT_DIR)/%.pb-c.c,$(CONF_PROTO_FILES))
-CONF_H_FILES := $(patsubst $(PROTO_SRC_DIR)/confproto/%.proto,$(CONF_OUTPUT_DIR)/%.pb-c.h,$(CONF_PROTO_FILES))
+CONF_C_FILES := $(wildcard $(CONF_OUTPUT_DIR)/*.pb-c.c)
+CONF_H_FILES := $(wildcard $(CONF_OUTPUT_DIR)/*.pb-c.h)
 
-MSG_C_FILES := $(patsubst $(PROTO_SRC_DIR)/msgproto/%.proto,$(MSG_OUTPUT_DIR)/%.pb-c.c,$(MSG_PROTO_FILES))
-MSG_H_FILES := $(patsubst $(PROTO_SRC_DIR)/msgproto/%.proto,$(MSG_OUTPUT_DIR)/%.pb-c.h,$(MSG_PROTO_FILES))
+MSG_C_FILES := $(wildcard $(MSG_OUTPUT_DIR)/*.pb-c.c)
+MSG_H_FILES := $(wildcard $(MSG_OUTPUT_DIR)/*.pb-c.h)
 
-.PHONY: proto
-proto:
+
+
+# .PHONY: proto
+# proto:
 # 执行命令即可
 # Define the rule to generate C files from proto files
 $(CONF_OUTPUT_DIR)/%.pb-c.c $(CONF_OUTPUT_DIR)/%.pb-c.h: $(PROTO_SRC_DIR)/confproto/%.proto
