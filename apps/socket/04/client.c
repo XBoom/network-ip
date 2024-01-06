@@ -19,8 +19,8 @@ int main(int argc, char *argv[])
     server_addr.sin_addr.s_addr = inet_addr(argv[1]);
     server_addr.sin_port = htons(atoi(argv[2]));
 
-    ret = connect(server_sock, (const struct sockaddr *)&server_addr, sizeof(server_addr));
-    CHECK_RET(ret == -1, "connect failed");
+    // ret = connect(server_sock, (const struct sockaddr *)&server_addr, sizeof(server_addr));
+    // CHECK_RET(ret == -1, "connect failed");
 
     server_addr_len = sizeof(server_addr);
     for(int i = 0; i < 3; i++) 
