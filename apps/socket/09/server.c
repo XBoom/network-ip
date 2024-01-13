@@ -49,16 +49,15 @@ int main(int argc, char *argv[])
             CHECK_RET_GOTO(ret == -1, out, "write failed");
         }
         //关闭写
-        shutdown(client_sock, SHUT_RD);
+        shutdown(client_sock, SHUT_WR);
 
         memset(buff, 0 , sizeof(buff));
         while(read(client_sock, buff, sizeof(buff)))
         {
             LOG_INFO("server recv %s", buff);
         }
-        LOG_INFO("end");
         //关闭读
-        //shutdown(client_sock, SHUT_WR);
+        shutdown(client_sock, SHUT_RD);
     }
 out:
     close(server_sock);
