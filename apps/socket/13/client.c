@@ -8,15 +8,15 @@ int main(int argc, char *argv[])
     CHECK_RET(child_pid < 0, "fork failed");
     if(child_pid == 0)  //child
     {
-        sleep(5000);    
+        sleep(5);
         LOG_INFO("child end");
         exit(7);
     } else 
     {
         int status = 0;
-        while(!waitpid(child_pid, &status, WHOHANG))
+        while(!waitpid(child_pid, &status, WNOHANG))
         {
-            sleep(500);
+            sleep(1);
             LOG_INFO("wait child");
         } //进程不会阻塞
         if(WIFEXITED(status))

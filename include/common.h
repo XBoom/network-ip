@@ -9,6 +9,7 @@
 #include "xsocket.h"    //套接字头部
 #include "xfile.h"      //文件头部
 
+#include <sys/wait.h>   //wait
 #include <signal.h>     //信号
 
 #include "lib_log.h" //自定义日志文件

@@ -1,20 +1,27 @@
-#include <signal.h>
+#include <sys/wait.h>
 
 /**
-* 返回类型：void (*)(int)，表示返回一个指向参数为整型、返回类型为 void 的函数的指针
-* 函数名：signal，是函数的名称。
-* 参数列表：(int signo, void (*func)(int))，包括两个参数：
-    signo：整型，表示信号的编号。
-    (*func)(int)：一个指向参数为整型、返回类型为 void 的函数的指针，用于指定处理该信号时要调用的函数
+ * @brief 父进程主动请求获取子进程的返回值
+ * 1. 
+ * 2. 函数参数所指向的单元中还含有其他信息，需要宏进行分离
+ *   WIFEXITED 子进程正常终止时返回 真 true
+ *   WEXITSTATUS 返回子进程的返回值
 */
-void (*signal(int signo, void (*func)(int)))(int);
+//pid_t wait(int * statloc);
 
 
+//wait 函数会引起程序阻塞
 
 /**
-常用的处理信号有
-SIGALRM: 已经通过调用alarm函数注册的时间
-         通过 alarm 函数注册的时间表示：在接收到 SIGALRM 信号之前的秒数。当调用 alarm(seconds) 后，系统会在指定的秒数后发送 SIGALRM 信号给调用进程
-SIGINT: 输入 CTRL + C
-SIGCHLD: 子进程终止
+ * pid 等待终止的目标子进程的ID,若传递-1，则与wait函数相同，可以等待任意子进程终止
+ * statloc 与wait的含义相同
+ * option WNOHANG,即使没有终止的子进程也不会进入阻塞状态，而是返回0并退出函数
+ * 
 */
+//pid_t waitpid(pid_t pid, int *staloc, int options);
+
+
+int main()
+{
+    return 0;
+}
