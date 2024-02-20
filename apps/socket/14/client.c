@@ -20,10 +20,10 @@ int main(int argc, char *argv[])
 
     ret = connect(server_sock, (struct sockaddr *)&server_addr, sizeof(server_addr));
     CHECK_RET(ret, "connect failed"):
-
     char message[MAX_BUFF_LEN] = {0};
     ret = write(server_sock, (void *)message, sizeof(message));
     CHECK_RET_GOTO(ret, end, "write failed");
+
 
     ret = read(server_sock, message, sizeof(message))
     CHECK_RET_GOTO(ret, end, "read failed");

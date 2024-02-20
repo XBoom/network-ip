@@ -1,11 +1,6 @@
-int a;
+#include "common.h"
 
-void foo()
+int main(int argc, char *argv[])
 {
-    while (!a);
-}
-
-int main() {
-    foo();
-    return 0;
+    int a[] = {0};
 }
