@@ -1,6 +1,6 @@
 #include "common.h"
 
-#define MAX_BUFF_LEN (1024)
+#define MAX_BUFF_SIZE (30)
 
 int main(int argc, char *argv[])
 {
@@ -10,26 +10,31 @@ int main(int argc, char *argv[])
     int server_sock = 0;
     struct sockaddr_in server_addr;
 
+    //1. 构建套件字
     server_sock = socket(AF_INET, SOCK_STREAM, 0);
-    CHECK_RET(server_sock == 0, "socket failed");
+    CHECK_RET(server_sock == 0, "sock failed");
 
+    //2. 设置地址
     memset(&server_addr, 0, sizeof(server_addr));
     server_addr.sin_family = AF_INET;
     server_addr.sin_addr.s_addr = inet_addr(argv[1]);
     server_addr.sin_port = htons(atoi(argv[2]));
 
+    //3. 连接
     ret = connect(server_sock, (struct sockaddr *)&server_addr, sizeof(server_addr));
-    CHECK_RET(ret, "connect failed");
-    char message[MAX_BUFF_LEN] = "hello world";
-    ret = write(server_sock, (void *)message, sizeof(message));
-    CHECK_RET_GOTO(ret == 0, end, "write failed");
+    CHECK_RET(ret != 0, "connect failed");
 
-    ret = read(server_sock, message, sizeof(message));
-    CHECK_RET_GOTO(ret == 0, end, "read failed");
+    //4. 发送数据
+    char message[MAX_BUFF_SIZE] = "hello world";
+    ret = write(server_sock, message, sizeof(message));
+    CHECK_RET(ret == 0, "write failed");
 
-    LOG_INFO("recv %s", message);
-    
-end:
-    close(server_sock);
+    //5. 接收数据
+    char buff[MAX_BUFF_SIZE] = {0};
+    ret = read(server_sock, buff, MAX_BUFF_SIZE);
+    CHECK_RET(ret == 0, "read failed");
+
+    LOG_INFO("recv %s", buff);
+
     return 0;
 }

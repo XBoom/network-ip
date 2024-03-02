@@ -5,6 +5,8 @@
 #include <stdint.h> // uint8_t type
 #include <stdlib.h> //atoi 讲字符串表示整数
 #include <string.h> //字符处理 memset
+#include <unistd.h> //管道
+#include <errno.h>  //错误码
 
 #include "xsocket.h"    //套接字头部
 #include "xfile.h"      //文件头部
