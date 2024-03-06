@@ -8,6 +8,9 @@
 #include <unistd.h> //管道
 #include <errno.h>  //错误码
 
+#include <sys/types.h>  //mkfifo
+#include <sys/stat.h>
+
 #include "xsocket.h"    //套接字头部
 #include "xfile.h"      //文件头部
 
