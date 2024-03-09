@@ -19,10 +19,12 @@ int main(int argc, char *argv[])
 
     if(child_pid == 0)
     {
+        close(fds[0]);
         write(fds[1], str, sizeof(str));
     }
     else
     {
+        close(fds[1]);
         read(fds[0], buf, MAX_BUF_SIZE);
         LOG_INFO("parent recv %s", buf);
     }

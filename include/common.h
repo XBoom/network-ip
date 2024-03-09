@@ -23,4 +23,6 @@
 
 #include "uev.h"    //事件驱动
 
+#include "times.h"  //时间
+
 #endif
