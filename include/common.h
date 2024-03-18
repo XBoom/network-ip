@@ -8,21 +8,21 @@
 #include <unistd.h> //管道
 #include <errno.h>  //错误码
 
-#include <sys/types.h>  //mkfifo
+#include <sys/types.h> //mkfifo
 #include <sys/stat.h>
 
-#include "xsocket.h"    //套接字头部
-#include "xfile.h"      //文件头部
+#include "xsocket.h" //套接字头部
+#include "xfile.h"   //文件头部
 
-#include <sys/wait.h>   //wait
-#include <signal.h>     //信号
+#include <sys/wait.h> //wait
+#include <signal.h>   //信号
 
 #include "lib_log.h" //自定义日志文件
 #include "list.h"    //链表
-#include "utils.h"  //工具类
+#include "utils.h"   //工具类
 
-#include "uev.h"    //事件驱动
+#include "uev.h" //事件驱动
 
-#include "times.h"  //时间
+#include "times.h" //时间
 
 #endif

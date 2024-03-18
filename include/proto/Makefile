@@ -9,6 +9,9 @@ include $(ROOTDIR)/BuildEnv.mk
 CONF_OUTPUT_DIR := $(PROTO_SRC_DIR)/conf
 MSG_OUTPUT_DIR := $(PROTO_SRC_DIR)/msg
 
+info $(CONF_OUTPUT_DIR)
+info $(MSG_OUTPUT_DIR)
+
 CONF_PROTOC_FLAGS := --c_out=$(CONF_OUTPUT_DIR)
 MSG_PROTOC_FLAGS := --c_out=$(MSG_OUTPUT_DIR)
 
@@ -16,8 +19,8 @@ MSG_PROTOC_FLAGS := --c_out=$(MSG_OUTPUT_DIR)
 CONF_PROTO_FILES := $(wildcard $(PROTO_SRC_DIR)/confproto/*.proto)
 MSG_PROTO_FILES := $(wildcard $(PROTO_SRC_DIR)/msgproto/*.proto)
 
-# $(info CONF_OUTPUT_DIR: $(CONF_OUTPUT_DIR))
-# $(info CONF_PROTO_FILES: $(CONF_PROTO_FILES))
+$(info CONF_OUTPUT_DIR: $(CONF_OUTPUT_DIR))
+$(info CONF_PROTO_FILES: $(CONF_PROTO_FILES))
 
 # Define the output C files
 CONF_C_FILES := $(wildcard $(CONF_OUTPUT_DIR)/*.pb-c.c)
@@ -50,5 +53,5 @@ conf: $(CONF_C_FILES) $(CONF_H_FILES)
 msg: $(MSG_C_FILES) $(MSG_H_FILES)
 
 # Define the clean target
-clean:
-	rm $(CONF_C_FILES) $(CONF_H_FILES) $(MSG_C_FILES) $(MSG_H_FILES)
+# clean:
+# 	rm $(CONF_C_FILES) $(CONF_H_FILES) $(MSG_C_FILES) $(MSG_H_FILES)
