@@ -6,3 +6,6 @@
 
 // fifo
 #include <sys/stat.h>
+
+//System V 消息队列
+#include <sys/msg.h>
