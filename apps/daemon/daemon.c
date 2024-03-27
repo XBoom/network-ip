@@ -1,5 +1,7 @@
 #include <sys/stat.h>
 #include <stdlib.h> // EXIT_SUCCESS
+#include <unistd.h> // _SC_OPEN_MAX
+#include <fcntl.h>  // O_RWDR
 #include "daemon.h"
 
 #include "utils.h"
@@ -43,6 +45,27 @@ int daemon_init(int flags)
 
     if (!(flags & BD_NO_UMASK0))
         umask(0);
+
+    if (!(flags & BD_NO_CHDIR))
+        chdir("/");
+
+    if (!(flags & BD_NO_CLOSE_FILES))
+    {
+        max_fd = sysconf(_SC_OPEN_MAX);
+        if (max_fd == -1)
+            max_fd = BD_MAX_CLOSE;
+
+        for (fd = 0; fd < max_fd; fd++)
+            close(fd);
+    }
+
+    if (!(flags & BD_NO_REOPEN_STD_FDS))
+    {
+        close(STDIN_FILENO);
+
+        fd = open("/dev/null", O_RDWR);
+    }
+
 end:
     return -1;
 }
