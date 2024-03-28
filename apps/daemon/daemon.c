@@ -31,7 +31,7 @@ int daemon_init(int flags)
         _exit(EXIT_SUCCESS); // 父进程终止
     }
 
-    CHECK_RET_GOTO(setid() == -1, end, "setid failed");
+    CHECK_RET_GOTO(setsid() == -1, end, "setid failed");
 
     switch (fork())
     {
@@ -64,8 +64,39 @@ int daemon_init(int flags)
         close(STDIN_FILENO);
 
         fd = open("/dev/null", O_RDWR);
+
+        if (fd != STDIN_FILENO)
+            return -1;
+
+        if (dup2(STDIN_FILENO, STDOUT_FILENO) != STDOUT_FILENO)
+            return -1;
+
+        if (dup2(STDIN_FILENO, STDERR_FILENO) != STDERR_FILENO)
+            return -1;
     }
 
+    return 0;
 end:
     return -1;
 }
+
+int main(int argc, char *argv[])
+{
+    daemon_init(0);
+    sleep(20000);
+    LOG_INFO("daemon exit");
+    return 0;
+}
+
+/*
+系统关闭的时候 init 进程会向所有其子进程发送这个信号。
+在默认情况下，SIGTERM 信号会终止一个进程。
+如果 daemon 在终止之前需要做些清理工作，那么就需要为这个信号建立一个处理器
+
+而且处理器必须能快速地完成清理工作，
+因为 init 在发完 SIGTERM 信号的 5 秒之后会发送一个 SIGKILL 信号
+
+这并不意味着这个
+daemon 能够执行 5 秒的 CPU 时间，因为 init 会同时向系统中的所有进程发送信号，而它们可
+能都试图在 5 秒内完成清理工作
+*/

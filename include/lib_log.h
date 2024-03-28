@@ -1,6 +1,6 @@
 #ifndef __LIB_LOG_H__
 #define __LIB_LOG_H__
-
+#include <stdint.h>
 #define LOG_BUFF_LEN 512
 
 // 日志输出到哪里
@@ -51,17 +51,17 @@
 #define LT_INFO (4)  // 信息日志
 
 void log_output(uint32_t to_type, uint32_t log_type, uint32_t level,
-                    const char *file, uint32_t lineno, const char *func,
-                    const char *format, ...);
+                const char *file, uint32_t lineno, const char *func,
+                const char *format, ...);
 
 uint32_t log_level(uint32_t level, uint8_t is_set);
 
 #define WRITE_LOG(to_type, log_type, level, format, ...) \
     do                                                   \
     {                                                    \
-        log_output(to_type, log_type, level,         \
-                       __FILE__, __LINE__, __func__,     \
-                       format, ##__VA_ARGS__);           \
+        log_output(to_type, log_type, level,             \
+                   __FILE__, __LINE__, __func__,         \
+                   format, ##__VA_ARGS__);               \
     } while (0)
 
 // 默认写到屏幕
@@ -81,16 +81,16 @@ uint32_t log_level(uint32_t level, uint8_t is_set);
 //   FILE *stream：指向 FILE 对象的指针，表示要写入的文件流
 //       stdout 标准输出，这样输出就会显示在屏幕上(printf 默认)
 //       stderr 标准错误输出。它通常用于显示错误消息和诊断信息，也会显示在屏幕上
-#define REAL_INFO(format, ...)                          \
+#define REAL_INFO(format, ...)                      \
     do                                              \
     {                                               \
-        fprintf(stdout, "[%s:%d]" format "\n",         \
+        fprintf(stdout, "[%s:%d]" format "\n",      \
                 __func__, __LINE__, ##__VA_ARGS__); \
     } while (0)
-#define REAL_ERROR(format, ...)                         \
+#define REAL_ERROR(format, ...)                     \
     do                                              \
     {                                               \
-        fprintf(stderr, "[%s:%d]" format "\n",         \
+        fprintf(stderr, "[%s:%d]" format "\n",      \
                 __func__, __LINE__, ##__VA_ARGS__); \
     } while (0)
 

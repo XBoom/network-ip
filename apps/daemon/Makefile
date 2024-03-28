@@ -6,16 +6,19 @@ include $(ROOTDIR)/BuildEnv.mk
 
 # Compiler and flags
 CC := gcc
-CFLAGS += -Wall -Werror -g -O0
-INCLUDES := -I$(ROOTDIR)/include -I$(ROOTDIR)/libs/lib_uev/
-LDFLAGS := -L$(ROOTDIR)/libs/lib_uev/ -l_uev
+CFLAGS += -g -O0
+# INCLUDES := -I$(ROOTDIR)/include -I$(ROOTDIR)/libs/lib_uev/
+
+LDFLAGS += -L$(ROOTDIR)/libs/lib_uev/ -l_uev
+LDFLAGS += -L$(ROOTDIR)/libs/lib_log/ -l_log
 
 # Target
-uev: main.o
+daemon: daemon.o
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
-main.o: main.c
-	$(CC) $(CFLAGS) $(INCLUDES) -H -c $< -o $@
+daemon.o: daemon.c
+#	$(CC) $(CFLAGS) $(INCLUDES) -H -c $< -o $@
+	$(CC) $(CFLAGS) -H -c $< -o $@
 
 clean:
-	rm -f uev *.o
+	rm -f daemon *.o
