@@ -1,7 +1,29 @@
 syntax = "proto3";
 
-message dog {
-  string name = 1;
-  int32 id = 2;
-  string food = 3;
+//消息头
+message fifo_req_head
+{
+  int32 id = 1; //消息请求 id
+  string fifo = 2;  //响应的管道名称
+  int32 body_len = 3; //body 长度
+}
+
+//消息头
+message fifo_resp_head
+{
+  int32 id = 1;  //响应 ID，与请求一样表示响应的哪个请求
+  int32 code = 2;  //表示响应错误码
+  int32 len = 3; //数据长度
+}
+
+message fifo_request
+{
+  fifo_req_head head = 1;
+  string body = 2;
+}
+
+message fifo_response
+{
+  fifo_resp_head head = 1;
+  string body = 2;
 }
