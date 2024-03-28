@@ -4,6 +4,8 @@ CC := gcc
 #INCLUDES := -I$(ROOTDIR)/include
 
 CFLAGS := -I$(ROOTDIR)/include -Wall -Werror -fPIC
+CFLAGS += -I$(ROOTDIR)/include/proto/conf
+CFLAGS += -I$(ROOTDIR)/include/proto/msg
 
 # 编译目标
 SO_TARGET := 
