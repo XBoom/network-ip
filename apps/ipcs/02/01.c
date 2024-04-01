@@ -33,9 +33,15 @@ int main(int argc, char *argv[])
                 break;
             }
             // 构造接收消息结构
-            FifoResponse resp = FIFO_RESPONSE__INIT;
-            fifo_response__unpack(buff, MSG_MAX_LEN, &resp);
-            LOG_INFO("child recv %s", resp.body);
+            FifoResponse *resp = fifo_response__unpack(NULL, MSG_MAX_LEN, buff);
+            if (resp == NULL)
+            {
+                LOG_ERROR("child recv null");
+                return -1;
+            }
+            LOG_INFO("child recv %s", resp->body);
+
+            fifo_response__free_unpacked(resp, NULL);  // 释放消息
         }
         close(server_fd);
         LOG_INFO("child exit");
@@ -43,8 +49,7 @@ int main(int argc, char *argv[])
     }
     // 4. 构造一个消息
     FifoRequest request = FIFO_REQUEST__INIT;
-    request->id = getpid();
-    request->fifo = fifo_path;
+    request.fifo = fifo_path;
 
     size_t packed_size;
     uint8_t *packed_data = NULL;
