@@ -37,11 +37,12 @@ int main(int argc, char *argv[])
             if (resp == NULL)
             {
                 LOG_ERROR("child recv null");
+                close(server_fd);
                 return -1;
             }
             LOG_INFO("child recv %s", resp->body);
 
-            fifo_response__free_unpacked(resp, NULL);  // 释放消息
+            fifo_response__free_unpacked(resp, NULL); // 释放消息
         }
         close(server_fd);
         LOG_INFO("child exit");
@@ -51,18 +52,17 @@ int main(int argc, char *argv[])
     FifoRequest request = FIFO_REQUEST__INIT;
     request.fifo = fifo_path;
 
-    size_t packed_size;
+    size_t packed_size = fifo_request__get_packed_size((const FifoRequest *)&request);
     uint8_t *packed_data = NULL;
-    fifo_request__pack_to_buffer(&request, &packed_size);
     packed_data = (uint8_t *)malloc(packed_size);
-    fifo_request__pack(&request, packed_data, packet_size);
+    fifo_request__pack(&request, packed_data);
 
     // 5. 打开服务端监听管理，把消息写进去
     client_fd = open(SERVER_FIFO_PATH_NAME, O_WRONLY);
     CHECK_RET(client_fd < 0, "open fifo failed");
 
     // 6. 发送消息
-    ret = write(client_fd, packed_data, packet_size);
+    ret = write(client_fd, packed_data, packed_size);
     CHECK_RET(ret < 0, "write failed");
     waitpid(-1, &status, WNOHANG);
     LOG_INFO("parent exit");

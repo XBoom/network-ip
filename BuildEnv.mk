@@ -1,11 +1,15 @@
 #set environment variables for installation
 CC := gcc
 
-#INCLUDES := -I$(ROOTDIR)/include
-
 CFLAGS := -I$(ROOTDIR)/include -Wall -Werror -fPIC
-CFLAGS += -I$(ROOTDIR)/include/proto/conf
-CFLAGS += -I$(ROOTDIR)/include/proto/msg
+
+PROTO_CFG := $(ROOTDIR)/include/proto/conf
+PROTO_MSG := $(ROOTDIR)/include/proto/msg
+
+CFLAGS += -I$(PROTO_CFG)
+CFLAGS += -I$(PROTO_MSG)
+
+PROTO_SRC := $(ROOTDIR)/include/proto/
 
 # 编译目标
 SO_TARGET := 
@@ -15,6 +19,7 @@ PROCESS_LIBS := /home/libs/
 
 # 进程引用位置
 LDFLAGS := -Wl,-rpath,$(PROCESS_LIBS)
+LDFLAGS += -lprotobuf-c # proto 库
 
 
 # 定时 proto 编译器

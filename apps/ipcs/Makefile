@@ -11,7 +11,11 @@ $(info ROOTDIR: $(ROOTDIR))
 $(info DIR/FILE: $(DIR)/$(FILE))
 
 # 使用 wildcard 函数获取 src 目录下所有的 .c 文件的文件名。
-src = $(wildcard $(DIR)/*.c)
+src := $(wildcard $(DIR)/*.c)
+
+# include proto 文件
+src += $(wildcard PROTO_CFG/*.c)
+src += $(wildcard PROTO_MSG/*.c)
 
 # 使用 filter 函数过滤出指定文件
 filtered_src = $(filter $(FILE).c, $(src))
