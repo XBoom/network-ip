@@ -13,16 +13,13 @@ $(info DIR/FILE: $(DIR)/$(FILE))
 # 使用 wildcard 函数获取 src 目录下所有的 .c 文件的文件名。
 src := $(wildcard $(DIR)/*.c)
 
-# include proto 文件
-src += $(wildcard PROTO_CFG/*.c)
-src += $(wildcard PROTO_MSG/*.c)
-
 # 使用 filter 函数过滤出指定文件
 filtered_src = $(filter $(FILE).c, $(src))
+filtered_src += $(wildcard $(DIR)/PROTO_CFG/*.c)
+filtered_src += $(wildcard $(DIR)/PROTO_MSG/*.c)
 
 # 使用 patsubst 函数将 src 目录下的 .c 文件路径替换为 build 目录下的 .o 文件路径，从而生成所有的目标文件
-obj = $(patsubst $(DIR)/$(FILE).c, $(FILE).o, $(filtered_src))
-
+obj = $(patsubst %.c, %.o, $(filtered_src))
 
 CFLAGS += -g -O0
 
@@ -33,11 +30,11 @@ PROGS = demo
 
 all: ${PROGS}
 
-demo.o: $(DIR)/$(FILE).c
-	$(CC) $(CFLAGS) -H -c $< -o $@
+demo.o: $(filtered_src)
+	$(CC) $(CFLAGS) -c $< -o $@
 
-demo: demo.o
-		${CC} ${CFLAGS} -o $@ $^ ${LDFLAGS}
+demo: $(obj)
+	${CC} ${CFLAGS} -o $@ $^ ${LDFLAGS}
 
 .PHONY: clean help
 clean:
