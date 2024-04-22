@@ -1,3 +1,6 @@
+export ROOT_DIR = $(shell pwd)
+
+
 # -I include 表示将 include 目录添加到头文件搜索路径，以便编译器可以找到头文件
 # -Wall 启用所有警告信息。
 # -g 生成包含调试信息的可执行文件，以便进行调试。
