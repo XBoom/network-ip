@@ -2,6 +2,7 @@
 #define __EVENT_INTERNAL_H__
 
 #include "rb_tree.h"
+#include "tree.h"
 #include "event.h"
 
 struct event_base
