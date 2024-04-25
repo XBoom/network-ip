@@ -61,41 +61,40 @@ struct evbuffer *
 evbuffer_new(void)
 {
 	struct evbuffer *buffer;
-
+	
 	buffer = calloc(1, sizeof(struct evbuffer));
 
 	return (buffer);
 }
 
-void evbuffer_free(struct evbuffer *buffer)
+void
+evbuffer_free(struct evbuffer *buffer)
 {
 	if (buffer->orig_buffer != NULL)
 		free(buffer->orig_buffer);
 	free(buffer);
 }
 
-/*
+/* 
  * This is a destructive add.  The data from one buffer moves into
  * the other buffer.
  */
 
-#define SWAP(x, y)                           \
-	do                                       \
-	{                                        \
-		(x)->buffer = (y)->buffer;           \
-		(x)->orig_buffer = (y)->orig_buffer; \
-		(x)->misalign = (y)->misalign;       \
-		(x)->totallen = (y)->totallen;       \
-		(x)->off = (y)->off;                 \
-	} while (0)
+#define SWAP(x,y) do { \
+	(x)->buffer = (y)->buffer; \
+	(x)->orig_buffer = (y)->orig_buffer; \
+	(x)->misalign = (y)->misalign; \
+	(x)->totallen = (y)->totallen; \
+	(x)->off = (y)->off; \
+} while (0)
 
-int evbuffer_add_buffer(struct evbuffer *outbuf, struct evbuffer *inbuf)
+int
+evbuffer_add_buffer(struct evbuffer *outbuf, struct evbuffer *inbuf)
 {
 	int res;
 
 	/* Short cut for better performance */
-	if (outbuf->off == 0)
-	{
+	if (outbuf->off == 0) {
 		struct evbuffer tmp;
 		size_t oldoff = inbuf->off;
 
@@ -104,7 +103,7 @@ int evbuffer_add_buffer(struct evbuffer *outbuf, struct evbuffer *inbuf)
 		SWAP(outbuf, inbuf);
 		SWAP(inbuf, &tmp);
 
-		/*
+		/* 
 		 * Optimization comes with a price; we need to notify the
 		 * buffer if necessary of the changes. oldoff is the amount
 		 * of data that we tranfered from inbuf to outbuf
@@ -113,7 +112,7 @@ int evbuffer_add_buffer(struct evbuffer *outbuf, struct evbuffer *inbuf)
 			(*inbuf->cb)(inbuf, oldoff, inbuf->off, inbuf->cbarg);
 		if (oldoff && outbuf->cb != NULL)
 			(*outbuf->cb)(outbuf, 0, oldoff, outbuf->cbarg);
-
+		
 		return (0);
 	}
 
@@ -124,7 +123,8 @@ int evbuffer_add_buffer(struct evbuffer *outbuf, struct evbuffer *inbuf)
 	return (res);
 }
 
-int evbuffer_add_printf(struct evbuffer *buf, char *fmt, ...)
+int
+evbuffer_add_printf(struct evbuffer *buf, char *fmt, ...)
 {
 	int res = -1;
 	char *msg;
@@ -139,15 +139,15 @@ int evbuffer_add_printf(struct evbuffer *buf, char *fmt, ...)
 	if (vasprintf(&msg, fmt, ap) == -1)
 		goto end;
 #else
-#ifdef WIN32
+#  ifdef WIN32
 	_vsnprintf(buffer, sizeof(buffer) - 1, fmt, ap);
-	buffer[sizeof(buffer) - 1] = '\0';
-#else /* ! WIN32 */
+	buffer[sizeof(buffer)-1] = '\0';
+#  else /* ! WIN32 */
 	vsnprintf(buffer, sizeof(buffer), fmt, ap);
-#endif
+#  endif
 	msg = buffer;
 #endif
-
+	
 	res = strlen(msg);
 	if (evbuffer_add(buf, msg, res) == -1)
 		res = -1;
@@ -163,7 +163,8 @@ end:
 
 /* Reads data from an event buffer and drains the bytes read */
 
-int evbuffer_remove(struct evbuffer *buf, void *data, size_t datlen)
+int
+evbuffer_remove(struct evbuffer *buf, void *data, size_t datlen)
 {
 	size_t nread = datlen;
 	if (nread >= buf->off)
@@ -171,7 +172,7 @@ int evbuffer_remove(struct evbuffer *buf, void *data, size_t datlen)
 
 	memcpy(data, buf->buffer, nread);
 	evbuffer_drain(buf, nread);
-
+	
 	return (nread);
 }
 
@@ -188,17 +189,15 @@ evbuffer_readline(struct evbuffer *buffer)
 	char *line;
 	u_int i;
 
-	for (i = 0; i < len; i++)
-	{
+	for (i = 0; i < len; i++) {
 		if (data[i] == '\r' || data[i] == '\n')
 			break;
 	}
-
+	
 	if (i == len)
 		return (NULL);
 
-	if ((line = malloc(i + 1)) == NULL)
-	{
+	if ((line = malloc(i + 1)) == NULL) {
 		fprintf(stderr, "%s: out of memory\n", __func__);
 		evbuffer_drain(buffer, i);
 		return (NULL);
@@ -211,12 +210,11 @@ evbuffer_readline(struct evbuffer *buffer)
 	 * Some protocols terminate a line with '\r\n', so check for
 	 * that, too.
 	 */
-	if (i < len - 1)
-	{
-		char fch = data[i], sch = data[i + 1];
+	if ( i < len - 1 ) {
+		char fch = data[i], sch = data[i+1];
 
 		/* Drain one more character if needed */
-		if ((sch == '\r' || sch == '\n') && sch != fch)
+		if ( (sch == '\r' || sch == '\n') && sch != fch )
 			i += 1;
 	}
 
@@ -237,7 +235,8 @@ evbuffer_align(struct evbuffer *buf)
 
 /* Expands the available space in the event buffer to at least datlen */
 
-int evbuffer_expand(struct evbuffer *buf, size_t datlen)
+int
+evbuffer_expand(struct evbuffer *buf, size_t datlen)
 {
 	size_t need = buf->misalign + buf->off + datlen;
 
@@ -249,12 +248,9 @@ int evbuffer_expand(struct evbuffer *buf, size_t datlen)
 	 * If the misalignment fulfills our data needs, we just force an
 	 * alignment to happen.  Afterwards, we have enough space.
 	 */
-	if (buf->misalign >= datlen)
-	{
+	if (buf->misalign >= datlen) {
 		evbuffer_align(buf);
-	}
-	else
-	{
+	} else {
 		void *newbuf;
 		size_t length = buf->totallen;
 
@@ -275,13 +271,13 @@ int evbuffer_expand(struct evbuffer *buf, size_t datlen)
 	return (0);
 }
 
-int evbuffer_add(struct evbuffer *buf, void *data, size_t datlen)
+int
+evbuffer_add(struct evbuffer *buf, void *data, size_t datlen)
 {
 	size_t need = buf->misalign + buf->off + datlen;
 	size_t oldoff = buf->off;
 
-	if (buf->totallen < need)
-	{
+	if (buf->totallen < need) {
 		if (evbuffer_expand(buf, datlen) == -1)
 			return (-1);
 	}
@@ -295,12 +291,12 @@ int evbuffer_add(struct evbuffer *buf, void *data, size_t datlen)
 	return (0);
 }
 
-void evbuffer_drain(struct evbuffer *buf, size_t len)
+void
+evbuffer_drain(struct evbuffer *buf, size_t len)
 {
 	size_t oldoff = buf->off;
 
-	if (len >= buf->off)
-	{
+	if (len >= buf->off) {
 		buf->off = 0;
 		buf->buffer = buf->orig_buffer;
 		buf->misalign = 0;
@@ -312,19 +308,21 @@ void evbuffer_drain(struct evbuffer *buf, size_t len)
 
 	buf->off -= len;
 
-done:
+ done:
 	/* Tell someone about changes in this buffer */
 	if (buf->off != oldoff && buf->cb != NULL)
 		(*buf->cb)(buf, oldoff, buf->off, buf->cbarg);
+
 }
 
 /*
  * Reads data from a file descriptor into a buffer.
  */
 
-#define EVBUFFER_MAX_READ 4096
+#define EVBUFFER_MAX_READ	4096
 
-int evbuffer_read(struct evbuffer *buf, int fd, int howmuch)
+int
+evbuffer_read(struct evbuffer *buf, int fd, int howmuch)
 {
 	u_char *p;
 	size_t oldoff = buf->off;
@@ -336,7 +334,7 @@ int evbuffer_read(struct evbuffer *buf, int fd, int howmuch)
 #ifdef FIONREAD
 	if (ioctl(fd, FIONREAD, &n) == -1 || n == 0)
 		n = EVBUFFER_MAX_READ;
-#endif
+#endif	
 	if (howmuch < 0 || howmuch > n)
 		howmuch = n;
 
@@ -371,7 +369,8 @@ int evbuffer_read(struct evbuffer *buf, int fd, int howmuch)
 	return (n);
 }
 
-int evbuffer_write(struct evbuffer *buffer, int fd)
+int
+evbuffer_write(struct evbuffer *buffer, int fd)
 {
 	int n;
 #ifdef WIN32
@@ -404,8 +403,7 @@ evbuffer_find(struct evbuffer *buffer, u_char *what, size_t len)
 	u_char *search = buffer->buffer;
 	u_char *p;
 
-	while ((p = memchr(search, *what, remain)) != NULL && remain >= len)
-	{
+	while ((p = memchr(search, *what, remain)) != NULL && remain >= len) {
 		if (memcmp(p, what, len) == 0)
 			return (p);
 
@@ -417,8 +415,8 @@ evbuffer_find(struct evbuffer *buffer, u_char *what, size_t len)
 }
 
 void evbuffer_setcb(struct evbuffer *buffer,
-					void (*cb)(struct evbuffer *, size_t, size_t, void *),
-					void *cbarg)
+    void (*cb)(struct evbuffer *, size_t, size_t, void *),
+    void *cbarg)
 {
 	buffer->cb = cb;
 	buffer->cbarg = cbarg;
