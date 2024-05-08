@@ -1,5 +1,15 @@
 # This file contains rules which are shared between multiple Makefiles.
 
+ifeq ($(PREFIX_CC),)
+ifeq ($(wildcard *.cpp *.cc),)
+    PREFIX_CC=$(CC)
+else
+    PREFIX_CC=$(CPP)
+endif
+endif
+
+SUB_DIRS	:= $(subdir-y)
+
 first_rule: sub_dirs
 	$(MAKE) all_targets
 	
@@ -20,22 +30,17 @@ $(SO_TARGET): $(obj-y)
 	$(PREFIX_CC) -shared -o $@ $(filter $(obj-y), $^) $(LDFLAGS) $(EXTRA_LDFLAGS)
 endif
 # 递归的将头文件复制到编译目录include目录下
-ifdef INSTALL_INC
-	cp -rvf $(INSTALL_INC) $(BUILD_ROOT)/include
-endif
-	mkdir -p $(PREFIX_LIB)/$(BUILD_LIBS_SUBDIR)
-	mkdir -p $(PACKET_ROOT)$(PREFIX_LIB)/$(BUILD_LIBS_SUBDIR)
-	cp $(SO_TARGET) $(PACKET_ROOT)$(PREFIX_LIB)/$(BUILD_LIBS_SUBDIR)
-	cp $(SO_TARGET) $(PREFIX_LIB)/$(BUILD_LIBS_SUBDIR)
-endif
-
-
-first_rule: sub_dirs
-	$(MAKE) all_targets
+# ifdef INSTALL_INC
+# 	cp -rvf $(INSTALL_INC) $(BUILD_ROOT)/include
+# endif
+#	mkdir -p $(PREFIX_LIB)/$(BUILD_LIBS_SUBDIR)
+#	mkdir -p $(PACKET_ROOT)$(PREFIX_LIB)/$(BUILD_LIBS_SUBDIR)
+#	cp $(SO_TARGET) $(PACKET_ROOT)$(PREFIX_LIB)/$(BUILD_LIBS_SUBDIR)
+#	cp $(SO_TARGET) $(PREFIX_LIB)/$(BUILD_LIBS_SUBDIR)
+# endif
 
 # 编译所有目标
 all_targets: $(O_TARGET) $(L_TARGET) $(E_TARGET) $(SO_TARGET) $(KO_TARGET) $(SUP_E_TARGET) $(SUP_SO_TARGET) $(SUP_L_TARGET) $(SUP_O_TARGET) $(PY_TARGET)
-
 
 # 清理所有目标
 .PHONY = $(clean-subdirs) clean
@@ -44,3 +49,6 @@ clean-dirs      := $(addprefix _clean_,$(patsubst _subdir_%,%,$(subdir-y)))
 $(clean-dirs):
 	$(MAKE) -C $(patsubst _clean_%,%,$@) clean
 endif
+
+# A rule to do nothing
+dummy:

@@ -1,33 +1,33 @@
+# 设置的当前目录
 export ROOT_DIR = $(shell pwd)
+# 引用编译默认参数
+include BuildEnv.mk
 
+# 设置编译信息
+export BUILD_DATE_TIME=$(shell date '+%Y-%m-%d %H:%M:%S' )
+export BUILD_DATE=$(shell date '+%y%m%d')
+export BUILDER_NAME=$(shell whoami)
 
-# -I include 表示将 include 目录添加到头文件搜索路径，以便编译器可以找到头文件
-# -Wall 启用所有警告信息。
-# -g 生成包含调试信息的可执行文件，以便进行调试。
-# -O0 禁用优化，以便生成更容易调试的代码。
-CPPFLAGS = -I include -Wall -g -O0
+# 公共与子目录
+# DIRS = libs apps
+DIRS = libs
+# COMMON = include libs tools
 
-# 使用 wildcard 函数获取 src 目录下所有的 .c 文件的文件名。
-src = $(wildcard src/*.c)
+# 默认编译目标all
+all: subdirs
 
-# 使用 patsubst 函数将 src 目录下的 .c 文件路径替换为 build 目录下的 .o 文件路径，从而生成所有的目标文件
-obj = $(patsubst src/%.c, build/%.o, $(src))
+# PHONY 生命一个伪目标，总是需要执行
+.PHONY: subdirs clean
 
-# 使用 wildcard 函数获取 include 目录下所有的 .h 文件的文件名。
-#headers = $(wildcard include/*.h)
+# 子目录
+subdirs: $(DIRS)
+	for dir in $(DIRS) ; do [ ! -d $$dir ] || make -C $$dir || exit 1 ; done
 
-# network-ip 是一个目标，它依赖于 $(obj)，表示可执行文件 network-ip 由所有的目标文件构建而成
-# 在执行命令时，$(CC) 表示使用编译器，$(obj) 表示所有的目标文件，-o network-ip 表示输出文件为 network-ip。
-network-ip: $(obj)
-	$(CC) $(obj) -o network-ip
+# 安装
+install: $(DIRS)
+	for dir in $(DIRS) ; do [ ! -d $$dir ] || make -C $$dir install || exit 1 ; done
 
-# build/%.o: src/%.c ${headers}:
-# build/%.o 是一个模式规则，表示如何将源文件编译成目标文件。
-# 	$< 表示规则中的第一个依赖项，即源文件。
-#	-c 表示生成目标文件而不链接。
-#	-o $@ 表示输出文件的名称，即目标文件。
-build/%.o: src/%.c ${headers}
-	$(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
-
+# 清理
 clean:
-	rm build/*.o network-ip
+	echo $(DIRS)
+	for dir in $(DIRS) ; do [ ! -d $$dir ] || make -C $$dir clean || exit 1 ; done
