@@ -20,7 +20,9 @@ all: subdirs
 .PHONY: subdirs clean
 
 # 子目录
+# 变量引用前的$需要用两个$来转义，否则它不会被Makefile解释为变量
 subdirs: $(DIRS)
+	@echo $(DIRS)
 	for dir in $(DIRS) ; do [ ! -d $$dir ] || make -C $$dir || exit 1 ; done
 
 # 安装
@@ -31,3 +33,4 @@ install: $(DIRS)
 clean:
 	echo $(DIRS)
 	for dir in $(DIRS) ; do [ ! -d $$dir ] || make -C $$dir clean || exit 1 ; done
+# 清理构建目录	rm -rf $(BUILD_ROOT)

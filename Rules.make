@@ -1,5 +1,6 @@
-# This file contains rules which are shared between multiple Makefiles.
+# 此文件用来在多个Makefile之间共享规则
 
+# 1. 根据语言设置编译命令
 ifeq ($(PREFIX_CC),)
 ifeq ($(wildcard *.cpp *.cc),)
     PREFIX_CC=$(CC)
@@ -8,16 +9,32 @@ else
 endif
 endif
 
-SUB_DIRS	:= $(subdir-y)
+# 2. 构建递归的子目录列表，后续通过目录中的 subdir-xx 变量控制编译子目录
+SUB_DIRS := $(subdir-y)
 
+# 3. 定义了first_rule目标，依赖于sub_dirs目标，
 first_rule: sub_dirs
-	$(MAKE) all_targets
+	make all_targets
 	
-# 递归子目录
+# 递归子目录，通过patsubst函数创建一个以_subdir_为前缀的子目录目标列表，
+# 然后定义sub_dirs目标，它依赖于一个名为dummy的伪目标和这些子目录目标
 subdir-list = $(patsubst %,_subdir_%,$(SUB_DIRS))
 sub_dirs: dummy $(subdir-list)
 
+ifdef SUB_DIRS
+$(subdir-list) : dummy
+	make -C $(patsubst _subdir_%,%,$@)
+endif
+
 all_targets: $(SO_TARGET)
+
+ifdef SO_TARGET
+    # SO_TARGET is defined
+	@echo SO_TARGET is defined to $(SO_TARGET)
+else
+	# SO_TARGET is not defined
+	@echo SO_TARGET is not defined
+endif
 
 # 编译共享库
 ifdef SO_TARGET
@@ -47,8 +64,16 @@ all_targets: $(O_TARGET) $(L_TARGET) $(E_TARGET) $(SO_TARGET) $(KO_TARGET) $(SUP
 ifneq ($(subdir-y),)
 clean-dirs      := $(addprefix _clean_,$(patsubst _subdir_%,%,$(subdir-y)))
 $(clean-dirs):
-	$(MAKE) -C $(patsubst _clean_%,%,$@) clean
+	make -C $(patsubst _clean_%,%,$@) clean
 endif
+
+clean-subdirs := $(clean-dirs) dummy
+clean: NOTMKDEP=1
+clean: $(clean-subdirs)
+	-rm -rf $(obj-y:.o=.d) $(obj-y) $(obj-m:.o=.d) $(obj-m) $(E_TARGET) $(SO_TARGET) $(L_TARGET) $(KO_TARGET) obj $(clean-files) *.d *.o *.gcda *.gcno *.bdf xtest/*.o xtest/*.gcda xtest/*.gcno
 
 # A rule to do nothing
 dummy:
+
+# 保护基础变量文件
+include $(ROOTDIR)/BaseVar.mk

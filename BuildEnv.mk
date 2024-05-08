@@ -1,5 +1,14 @@
-#set environment variables for installation
-CC := gcc
+# 设置不同的编译选项(默认使用MakeOpt_base.mk)的编译选项进行编译
+# 如果判断 MakeOpt，默认使用 MakeOpt-Base.mk
+ifeq ($(MakeOpt),)
+MakeOpt=Base	
+endif
+
+# 尝试包含一个可选参数
+-include $(ROOTDIR)/MakeOpt-$(MakeOpt).mk
+
+# 设置环境变量
+CC := gcc 
 
 CFLAGS := -I$(ROOTDIR)/include -Wall -Werror -fPIC
 

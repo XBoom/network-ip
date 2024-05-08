@@ -54,8 +54,6 @@ install: $(SO_TARGET)
 # 将 .so 文件移动到指定目录
 	cp $< $(PROCESS_LIBS)/$<
 
-obj-y += $(sf_capture-y)
-
 C__SOURCES := $(wildcard *.c)
 CPPSOURCES := $(wildcard *.cpp)
 CXXSOURCES := $(wildcard *.cc)
@@ -63,5 +61,7 @@ CXXSOURCES := $(wildcard *.cc)
 obj-y += $(C__SOURCES:%.c=%.o)
 obj-y += $(CPPSOURCES:%.cpp=%.o)
 obj-y += $(CXXSOURCES:%.cc=%.o)
+
+subdir-y += example
 
 include $(ROOTDIR)/Rules.make
