@@ -1,16 +1,16 @@
 # Find the root directory
-ifeq "$(ROOTDIR)" "" 
-export ROOTDIR=$(shell while true; do if [ -f BuildEnv.mk ]; then pwd;exit; else cd ..;fi;done;)
+ifeq "$(ROOT_DIR)" "" 
+export ROOT_DIR=$(shell while true; do if [ -f BuildEnv.mk ]; then pwd;exit; else cd ..;fi;done;)
 endif
-include $(ROOTDIR)/BuildEnv.mk
+include $(ROOT_DIR)/BuildEnv.mk
 
 # Compiler and flags
 CC := gcc
 CFLAGS += -g -O0
-# INCLUDES := -I$(ROOTDIR)/include -I$(ROOTDIR)/libs/lib_uev/
+# INCLUDES := -I$(ROOT_DIR)/include -I$(ROOT_DIR)/libs/lib_uev/
 
-LDFLAGS += -L$(ROOTDIR)/libs/lib_uev/ -l_uev
-LDFLAGS += -L$(ROOTDIR)/libs/lib_log/ -l_log
+LDFLAGS += -L$(ROOT_DIR)/libs/lib_uev/ -l_uev
+LDFLAGS += -L$(ROOT_DIR)/libs/lib_log/ -l_log
 
 # Target
 daemon: daemon.o

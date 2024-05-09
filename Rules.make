@@ -19,6 +19,7 @@ first_rule: sub_dirs
 # 递归子目录，通过patsubst函数创建一个以_subdir_为前缀的子目录目标列表，
 # 然后定义sub_dirs目标，它依赖于一个名为dummy的伪目标和这些子目录目标
 subdir-list = $(patsubst %,_subdir_%,$(SUB_DIRS))
+$(info subdir-list: $(subdir-list))
 sub_dirs: dummy $(subdir-list)
 
 ifdef SUB_DIRS
@@ -27,14 +28,6 @@ $(subdir-list) : dummy
 endif
 
 all_targets: $(SO_TARGET)
-
-ifdef SO_TARGET
-    # SO_TARGET is defined
-	@echo SO_TARGET is defined to $(SO_TARGET)
-else
-	# SO_TARGET is not defined
-	@echo SO_TARGET is not defined
-endif
 
 # 编译共享库
 ifdef SO_TARGET
@@ -57,12 +50,12 @@ endif
 # endif
 
 # 编译所有目标
-all_targets: $(O_TARGET) $(L_TARGET) $(E_TARGET) $(SO_TARGET) $(KO_TARGET) $(SUP_E_TARGET) $(SUP_SO_TARGET) $(SUP_L_TARGET) $(SUP_O_TARGET) $(PY_TARGET)
+# all_targets: $(O_TARGET) $(L_TARGET) $(E_TARGET) $(SO_TARGET) $(KO_TARGET) $(SUP_E_TARGET) $(SUP_SO_TARGET) $(SUP_L_TARGET) $(SUP_O_TARGET) $(PY_TARGET)
 
 # 清理所有目标
 .PHONY = $(clean-subdirs) clean
 ifneq ($(subdir-y),)
-clean-dirs      := $(addprefix _clean_,$(patsubst _subdir_%,%,$(subdir-y)))
+clean-dirs := $(addprefix _clean_,$(patsubst _subdir_%,%,$(subdir-y)))
 $(clean-dirs):
 	make -C $(patsubst _clean_%,%,$@) clean
 endif
@@ -76,4 +69,4 @@ clean: $(clean-subdirs)
 dummy:
 
 # 保护基础变量文件
-include $(ROOTDIR)/BaseVar.mk
+include $(ROOT_DIR)/BaseVar.mk

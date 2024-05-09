@@ -1,9 +1,9 @@
 # Makefile for proto directory
 #1. 找到根目录
-ifeq "$(ROOTDIR)" "" 
-export ROOTDIR=$(shell while true; do if [ -f BuildEnv.mk ]; then pwd;exit; else cd ..;fi;done;)
+ifeq "$(ROOT_DIR)" "" 
+export ROOT_DIR=$(shell while true; do if [ -f BuildEnv.mk ]; then pwd;exit; else cd ..;fi;done;)
 endif
-include $(ROOTDIR)/BuildEnv.mk
+include $(ROOT_DIR)/BuildEnv.mk
 
 # 定义proto 文件的来源位置(解决proto升成的pb-c不在指定文件夹下而是带上了他的目录结构)
 CONF_INPUT_DIR := $(PROTO_SRC_DIR)/confproto

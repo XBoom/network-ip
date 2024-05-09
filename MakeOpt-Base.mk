@@ -2,4 +2,5 @@
 # MakeOption-Base.mk 默认
 # 项目基本框架的Make选项，只编译基本框架内容
 
-CONFIG_LIBS_LOG=y
+OPTIONS_LIB_LOG=y
+OPTIONS_LIB_UEV=y

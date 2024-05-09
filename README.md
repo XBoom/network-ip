@@ -38,6 +38,7 @@
   - lib_uev 一个事件模型公共库
   - lib_xml xml读取
     - protobuf_c proto - bin 转换
+- drivers 内核模块
 
 ### Make
 

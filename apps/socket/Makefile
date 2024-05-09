@@ -1,13 +1,13 @@
 #1. 找到根目录
-ifeq "$(ROOTDIR)" "" 
-export ROOTDIR=$(shell while true; do if [ -f BuildEnv.mk ]; then pwd;exit; else cd ..;fi;done;)
+ifeq "$(ROOT_DIR)" "" 
+export ROOT_DIR=$(shell while true; do if [ -f BuildEnv.mk ]; then pwd;exit; else cd ..;fi;done;)
 endif
-include $(ROOTDIR)/BuildEnv.mk
+include $(ROOT_DIR)/BuildEnv.mk
 
 
 DIR ?= 01	#指定目录
 
-$(info ROOTDIR: $(ROOTDIR))
+$(info ROOT_DIR: $(ROOT_DIR))
 $(info DIR: $(DIR))
 
 # 使用 wildcard 函数获取 src 目录下所有的 .c 文件的文件名。
@@ -19,8 +19,8 @@ obj = $(patsubst $(DIR)/%.c, %.o, $(src))
 
 CFLAGS += -g -O0
 
-LDFLAGS += -L$(ROOTDIR)/libs/lib_uev/ -l_uev
-LDFLAGS += -L$(ROOTDIR)/libs/lib_log/ -l_log
+LDFLAGS += -L$(ROOT_DIR)/libs/lib_uev/ -l_uev
+LDFLAGS += -L$(ROOT_DIR)/libs/lib_log/ -l_log
 
 PROGS =	client server
 

@@ -2,4 +2,4 @@
 
 # 项目基本框架的Make选项，只编译基本框架内容
 
-include $(ROOTDIR)/MakeOpt-Base.mk
+include $(ROOT_DIR)/MakeOpt-Base.mk

@@ -1,9 +1,10 @@
-ifeq "$(ROOTDIR)" "" 
-export ROOTDIR=$(shell while true; do if [ -f BuildEnv.mk ]; then pwd;exit; else cd ..;fi;done;)
+ifeq "$(ROOT_DIR)" "" 
+export ROOT_DIR=$(shell while true; do if [ -f BuildEnv.mk ]; then pwd;exit; else cd ..;fi;done;)
 endif
-include $(ROOTDIR)/BuildEnv.mk
+include $(ROOT_DIR)/BuildEnv.mk
 
-# 定义 ${CONFIG_LIBS_LOG}=y 最后变成 subdir-y += lib_log
-subdir-${CONFIG_LIBS_LOG} += lib_log
+# 定义 ${OPTIONS_LIB_LOG}=y 最后变成 subdir-y += lib_log
+subdir-${OPTIONS_LIB_LOG} += lib_log
+subdir-${OPTIONS_LIB_UEV} += lib_uev
 
-include $(ROOTDIR)/Rules.make
+include $(ROOT_DIR)/Rules.make
