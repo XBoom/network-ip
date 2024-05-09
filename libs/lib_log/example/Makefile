@@ -1,8 +1,8 @@
 #1. 找到根目录
-ifeq "$(ROOTDIR)" "" 
-export ROOTDIR=$(shell while true; do if [ -f BuildEnv.mk ]; then pwd;exit; else cd ..;fi;done;)
+ifeq "$(ROOT_DIR)" "" 
+export ROOT_DIR=$(shell while true; do if [ -f BuildEnv.mk ]; then pwd;exit; else cd ..;fi;done;)
 endif
-include $(ROOTDIR)/BuildEnv.mk
+include $(ROOT_DIR)/BuildEnv.mk
 
 
 # 使用 wildcard 函数获取 src 目录下所有的 .c 文件的文件名。
@@ -14,8 +14,8 @@ obj = $(patsubst ./%.c, ./%.o, $(src))
 # Compiler and flags
 CFLAGS += -g -O0
 
-LDFLAGS += -L$(ROOTDIR)/libs/lib_uev/ -l_uev
-LDFLAGS += -L$(ROOTDIR)/libs/lib_log/ -l_log
+LDFLAGS += -L$(ROOT_DIR)/libs/lib_uev/ -l_uev
+LDFLAGS += -L$(ROOT_DIR)/libs/lib_log/ -l_log
 
 # Target
 SO_TARGET = test
@@ -30,7 +30,7 @@ $(SO_TARGET): $(obj)
 clean:
 	rm -f $(SO_TARGET) *.o
 
-#include $(ROOTDIR)/Rules.make
+#include $(ROOT_DIR)/Rules.make
 
 # 在程序运行的时候指定库文件搜索路径，可以使用以下几种方法
 #1. LD_LIBRARY_PATH 环境变量, 告诉动态链接器在运行时在指定的目录中查找共享库文件

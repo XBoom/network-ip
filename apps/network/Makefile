@@ -1,8 +1,8 @@
 #1. 找到根目录
-ifeq "$(ROOTDIR)" "" 
-export ROOTDIR=$(shell while true; do if [ -f BuildEnv.mk ]; then pwd;exit; else cd ..;fi;done;)
+ifeq "$(ROOT_DIR)" "" 
+export ROOT_DIR=$(shell while true; do if [ -f BuildEnv.mk ]; then pwd;exit; else cd ..;fi;done;)
 endif
-include $(ROOTDIR)/BuildEnv.mk
+include $(ROOT_DIR)/BuildEnv.mk
 
 # -I include 表示将 include 目录添加到头文件搜索路径，以便编译器可以找到头文件
 # -Wall 启用所有警告信息。

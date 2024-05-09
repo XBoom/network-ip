@@ -1,7 +1,12 @@
 syntax = "proto3";
 
-message dog {
-  string name = 1;
-  int32 id = 2;
-  string food = 3;
+message fifo_request
+{
+  string fifo = 1;
+  string body = 2;
+}
+
+message fifo_response
+{
+  string body = 1;
 }

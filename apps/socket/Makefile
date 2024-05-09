@@ -1,13 +1,13 @@
 #1. 找到根目录
-ifeq "$(ROOTDIR)" "" 
-export ROOTDIR=$(shell while true; do if [ -f BuildEnv.mk ]; then pwd;exit; else cd ..;fi;done;)
+ifeq "$(ROOT_DIR)" "" 
+export ROOT_DIR=$(shell while true; do if [ -f BuildEnv.mk ]; then pwd;exit; else cd ..;fi;done;)
 endif
-include $(ROOTDIR)/BuildEnv.mk
+include $(ROOT_DIR)/BuildEnv.mk
 
 
 DIR ?= 01	#指定目录
 
-$(info ROOTDIR: $(ROOTDIR))
+$(info ROOT_DIR: $(ROOT_DIR))
 $(info DIR: $(DIR))
 
 # 使用 wildcard 函数获取 src 目录下所有的 .c 文件的文件名。
@@ -19,12 +19,21 @@ obj = $(patsubst $(DIR)/%.c, %.o, $(src))
 
 CFLAGS += -g -O0
 
-LDFLAGS += -L$(ROOTDIR)/libs/lib_uev/ -l_uev
-LDFLAGS += -L$(ROOTDIR)/libs/lib_log/ -l_log
+LDFLAGS += -L$(ROOT_DIR)/libs/lib_uev/ -l_uev
+LDFLAGS += -L$(ROOT_DIR)/libs/lib_log/ -l_log
 
 PROGS =	client server
 
 all: ${PROGS}
+
+# %.o: 目标文件名模式，其中 % 匹配任意字符。
+# $(DIR)/%.c: 源文件名模式，其中 % 匹配任意字符，$(DIR) 变量代表目录名。
+# $(CC): 编译器命令，例如 gcc 或 clang。
+# $(CFLAGS): 编译器选项，例如 -O2 或 -g。
+# -H: 生成依赖关系文件。
+# -c: 只编译，不链接。
+# $<: 源文件名，由模式规则自动生成。
+# $@: 目标文件名，由模式规则自动生成
 
 %.o: $(DIR)/%.c
 	$(CC) $(CFLAGS) -H -c $< -o $@
