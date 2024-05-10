@@ -28,7 +28,15 @@ SO_TARGET :=
 PROCESS_LIBS := /home/libs/
 
 # 进程引用位置
-LDFLAGS := -Wl,-rpath,$(PROCESS_LIBS)
+# -Wl 允许将参数传递给链接器（ld），链接器通过这些参数来处理链接过程
+# -rpath 选项用于指定运行时库搜索路径。
+#   例如，-Wl,-rpath,/home/libs/ 将告诉链接器在 /home/libs/ 目录下寻找运行时库
+# 
+# 使用 -L 指定库文件搜索路径，供链接器查找库文件；而 -rpath 指定程序运行时库搜索路径，用于在运行时加载所需的共享库。
+#    这两个选项在链接阶段和程序运行阶段扮演不同的角色，确保程序正确链接和运行所需的库文件
+LDFLAGS := -Wl,-rpath,$(PROCESS_LIBS) -L$(PROCESS_LIBS)
+
+# 默认引用库(每个都会引用)
 LDFLAGS += -lprotobuf-c # proto 库
 
 

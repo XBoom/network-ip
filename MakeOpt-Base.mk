@@ -2,5 +2,10 @@
 # MakeOption-Base.mk 默认
 # 项目基本框架的Make选项，只编译基本框架内容
 
+## 依赖库
 OPTIONS_LIB_LOG=y
 OPTIONS_LIB_UEV=y
+
+## 进程
+OPTIONS_APP_RCU=y
+OPTIONS_APP_UEV=y

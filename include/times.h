@@ -41,7 +41,7 @@
  * Structure returned by gettimeofday(2) system call,
  * and used in other calls.
  */
-struct timeval
+struct _timeval
 {
     long tv_sec;  /* seconds */
     long tv_usec; /* and microseconds */
@@ -50,7 +50,7 @@ struct timeval
 /*
  * Structure defined by POSIX.1b to be like a timeval.
  */
-struct timespec
+struct _timespec
 {
     time_t tv_sec; /* seconds */
     long tv_nsec;  /* and nanoseconds */
@@ -146,8 +146,8 @@ struct timezone
 
 struct itimerval
 {
-    struct timeval it_interval; /* timer interval */
-    struct timeval it_value;    /* current value */
+    struct _timeval it_interval; /* timer interval */
+    struct _timeval it_value;    /* current value */
 };
 
 /*
