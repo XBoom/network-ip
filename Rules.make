@@ -27,9 +27,9 @@ $(subdir-list) : dummy
 	make -C $(patsubst _subdir_%,%,$@)
 endif
 
-all_targets: $(SO_TARGET)
+all_targets: $(SO_TARGET) $(E_TARGET)
 
-# 编译共享库
+#============ 编译共享库 start ===================
 ifdef SO_TARGET
 
 # 编译位置无关的共享库
@@ -48,11 +48,21 @@ endif
 #	cp $(SO_TARGET) $(PACKET_ROOT)$(PREFIX_LIB)/$(BUILD_LIBS_SUBDIR)
 #	cp $(SO_TARGET) $(PREFIX_LIB)/$(BUILD_LIBS_SUBDIR)
 # endif
+#============ 编译共享库 end ===================
+
+#============ 编译进程 start ===================
+ifdef E_TARGET
+$(E_TARGET): $(obj-y)
+	$(info "EXTRA_LDFLAGS" $(EXTRA_LDFLAGS))
+	-rm -f $@
+	$(PREFIX_CC) -o $@ $(filter $(obj-y), $^) $(LDFLAGS) $(EXTRA_LDFLAGS)
+endif
+#============ 编译进程 end ===================
 
 # 编译所有目标
 # all_targets: $(O_TARGET) $(L_TARGET) $(E_TARGET) $(SO_TARGET) $(KO_TARGET) $(SUP_E_TARGET) $(SUP_SO_TARGET) $(SUP_L_TARGET) $(SUP_O_TARGET) $(PY_TARGET)
 
-# 清理所有目标
+#============ 清理所有目标 start ===================
 .PHONY = $(clean-subdirs) clean
 ifneq ($(subdir-y),)
 clean-dirs := $(addprefix _clean_,$(patsubst _subdir_%,%,$(subdir-y)))
@@ -64,6 +74,8 @@ clean-subdirs := $(clean-dirs) dummy
 clean: NOTMKDEP=1
 clean: $(clean-subdirs)
 	-rm -rf $(obj-y:.o=.d) $(obj-y) $(obj-m:.o=.d) $(obj-m) $(E_TARGET) $(SO_TARGET) $(L_TARGET) $(KO_TARGET) obj $(clean-files) *.d *.o *.gcda *.gcno *.bdf xtest/*.o xtest/*.gcda xtest/*.gcno
+
+#============ 清理所有目标 start ===================
 
 # A rule to do nothing
 dummy:

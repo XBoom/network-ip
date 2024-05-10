@@ -4,18 +4,19 @@ export ROOT_DIR=$(shell while true; do if [ -f BuildEnv.mk ]; then pwd;exit; els
 endif
 include $(ROOT_DIR)/BuildEnv.mk
 
-# Compiler and flags
-INCLUDES =
-CFLAGS = -g -O0
-#INCLUDES := -I$(ROOT_DIR)/include -I$(ROOT_DIR)/libs/lib_uev/
-#LDFLAGS := -L$(ROOT_DIR)/libs/lib_uev/ -l_uev
+# 编译目标
+E_TARGET = rcu
 
-# Target
-rcu: main.o
-	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
+# 编译选项
+CFLAGS += -g -O0	
 
-main.o: main.c
-	$(CC) $(CFLAGS) $(INCLUDES) -H -c $< -o $@
+# 引用头文件
+CFLAGS += -I. 
+# 链接动态库
+EXTRA_LDFLAGS += -l_log
 
-clean:
-	rm -f rcu *.o
+C__SOURCES := $(wildcard *.c)
+
+obj-y += $(C__SOURCES:%.c=%.o)
+
+include $(ROOT_DIR)/Rules.make
