@@ -46,6 +46,14 @@ PROTOC := $(ROOT_DIR)/tools/protoc
 # proto 位置
 PROTO_SRC_DIR := $(ROOT_DIR)/include/proto
 
+# 定义proto 文件的来源位置(解决proto升成的pb-c不在指定文件夹下而是带上了他的目录结构)
+CONF_INPUT_DIR := $(PROTO_SRC_DIR)/confproto/
+MSG_INPUT_DIR := $(PROTO_SRC_DIR)/msgproto/
+
+# 定义 proto编译的输出位置
+CONF_OUTPUT_DIR := $(PROTO_SRC_DIR)/conf/
+MSG_OUTPUT_DIR := $(PROTO_SRC_DIR)/msg/
+
 # ifdef COMENT
 # $^ 表示规则的所有先决条件（依赖项）,用于指定用于构建目标的所有源文件或依赖项。
 # 目标: 依赖项1.c 依赖项2.c

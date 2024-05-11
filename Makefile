@@ -10,7 +10,7 @@ export BUILDER_NAME=$(shell whoami)
 
 # 公共与子目录
 # DIRS = libs apps
-DIRS = libs apps include
+DIRS = include libs apps
 # COMMON = include libs tools
 
 # 默认编译目标all

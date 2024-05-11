@@ -13,7 +13,7 @@ CFLAGS += -g -O0
 # 引用头文件
 CFLAGS += -I. 
 # 链接动态库
-EXTRA_LDFLAGS += -l_log
+EXTRA_LDFLAGS += -l_log -l_conf
 
 C__SOURCES := $(wildcard *.c)
 

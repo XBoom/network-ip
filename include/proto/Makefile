@@ -5,14 +5,6 @@ export ROOT_DIR=$(shell while true; do if [ -f BuildEnv.mk ]; then pwd;exit; els
 endif
 include $(ROOT_DIR)/BuildEnv.mk
 
-# 定义proto 文件的来源位置(解决proto升成的pb-c不在指定文件夹下而是带上了他的目录结构)
-CONF_INPUT_DIR := $(PROTO_SRC_DIR)/confproto/
-MSG_INPUT_DIR := $(PROTO_SRC_DIR)/msgproto/
-
-# 定义 proto编译的输出位置
-CONF_OUTPUT_DIR := $(PROTO_SRC_DIR)/conf/
-MSG_OUTPUT_DIR := $(PROTO_SRC_DIR)/msg/
-
 # 定义元文件
 CONF_PROTO_FILES := $(wildcard $(PROTO_SRC_DIR)/confproto/*.proto)
 MSG_PROTO_FILES := $(wildcard $(PROTO_SRC_DIR)/msgproto/*.proto)

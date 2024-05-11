@@ -47,13 +47,6 @@ SO_TARGET = lib_log.so
 # %.o: %.c
 # 	$(CC) $(CFLAGS) -c $< -o $@
 
-#设置默认目标，在执行 make 之后会自动执行
-.DEFAULT_GOAL := install
-
-install: $(SO_TARGET)
-# 将 .so 文件移动到指定目录
-	cp $< $(PROCESS_LIBS)/$<
-
 C__SOURCES := $(wildcard *.c)
 CPPSOURCES := $(wildcard *.cpp)
 CXXSOURCES := $(wildcard *.cc)
