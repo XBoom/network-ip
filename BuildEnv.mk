@@ -41,7 +41,7 @@ LDFLAGS += -lprotobuf-c # proto 库
 
 
 # 定时 proto 编译器
-PROTOC := protoc
+PROTOC := $(ROOT_DIR)/tools/protoc
 
 # proto 位置
 PROTO_SRC_DIR := $(ROOT_DIR)/include/proto
