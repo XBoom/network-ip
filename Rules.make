@@ -38,7 +38,15 @@ CFLAGS += -fPIC
 $(SO_TARGET): $(obj-y)
 	-rm -f $@
 	$(PREFIX_CC) -shared -o $@ $(filter $(obj-y), $^) $(LDFLAGS) $(EXTRA_LDFLAGS)
+
+#设置默认目标，在执行 make 之后会自动执行
+.DEFAULT_GOAL := install
+
+install: $(SO_TARGET)
+# 将 .so 文件移动到指定目录
+	cp $< $(PROCESS_LIBS)/$<
 endif
+
 # 递归的将头文件复制到编译目录include目录下
 # ifdef INSTALL_INC
 # 	cp -rvf $(INSTALL_INC) $(BUILD_ROOT)/include

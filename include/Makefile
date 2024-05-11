@@ -4,3 +4,7 @@ export ROOT_DIR=$(shell while true; do if [ -f BuildEnv.mk ]; then pwd;exit; els
 endif
 include $(ROOT_DIR)/BuildEnv.mk
 
+# 添加编译proto逻辑
+subdir-${OPTIONS_INCLUDE_PROTO} += proto
+
+include $(ROOT_DIR)/Rules.make
