@@ -5,37 +5,41 @@
 #include <sys/epoll.h>
 #include <sys/signalfd.h>
 
-//TODO 测试一下这里 (next = node->next, 1) 的作用
-#define _UEV_FOREACH(node, list)    \
-    for(typeof(node) next, node = list; \
+// TODO 测试一下这里 (next = node->next, 1) 的作用
+#define _UEV_FOREACH(node, list)         \
+    for (typeof(node) next, node = list; \
          node && (next = node->next, 1); \
          node = next)
 
 // 将 node 插入到 list 前面
-#define _UEV_INSERT(node, list) do {    \
-    typeof(node) next;    \
-    next = list;    \
-    list = node;    \
-    if(next)    \
-        next->prev = node;  \
-    node->next = next;  \
-    node->prev = NULL;  \
-}while(0)
+#define _UEV_INSERT(node, list) \
+    do                          \
+    {                           \
+        typeof(node) next;      \
+        next = list;            \
+        list = node;            \
+        if (next)               \
+            next->prev = node;  \
+        node->next = next;      \
+        node->prev = NULL;      \
+    } while (0)
 
 // 从 list 中删除 node
-#define _UEV_REMOVE(node ,list) do{ \
-    typeof(node) prev, next;   \
-    prev = node->prev;  \
-    next = node->next;  \
-    if(prev)    \
-        prev->next = next;  \
-    if(next)    \
-        next->prev = prev;  \
-    node->prev = NULL;  \
-    node->next = NULL;  \
-    if(list == node)    \
-        list = next;    \
-}while(0)
+#define _UEV_REMOVE(node, list)  \
+    do                           \
+    {                            \
+        typeof(node) prev, next; \
+        prev = node->prev;       \
+        next = node->next;       \
+        if (prev)                \
+            prev->next = next;   \
+        if (next)                \
+            next->prev = prev;   \
+        node->prev = NULL;       \
+        node->next = NULL;       \
+        if (list == node)        \
+            list = next;         \
+    } while (0)
 
 /*
 Cron:
@@ -61,99 +65,100 @@ typedef enum
 
 // 事件掩码
 #define UEV_EVENT_MASK (UEV_ERROR | UEV_READ | UEV_WRITE | UEV_PRI | \
-            UEV_RDHUP | UEV_HUP | UEV_EDGE | UEV_ONESHOT)
+                        UEV_RDHUP | UEV_HUP | UEV_EDGE | UEV_ONESHOT)
 
-//struct uev_st;  //向前声明，告之这里有一个结构体 uev_st
+// struct uev_st;  //向前声明，告之这里有一个结构体 uev_st
 
 // 事件上下文
 struct uev_ctx_st
 {
-    uint8_t running;     // 运行状态
-    int fd;              // epoll 句柄
-    uint32_t max_events; // epoll 最大时间数量
-    struct uev_st *watchers;    //观察的上下文
-    uint32_t workaround; /* For workarounds, e.g. redirected stdin */
+    uint8_t running;         // 运行状态
+    int fd;                  // epoll 句柄
+    uint32_t max_events;     // epoll 最大时间数量
+    struct uev_st *watchers; // 事件链表
+    uint32_t workaround;     /* For workarounds, e.g. redirected stdin */
 };
 
 // 使用宏定义用于隐藏私有数据成员
-#define uev_private_st  \
-    struct uev_st *next, *prev;    \
-    int active; \
-    int events; \
-    void (*cb)(struct uev_st *, void *, int);  \
-    void *args; \
-    union   /* Watcher type */\
-    { /* Cron watchers */   \
-        struct  \
-        {   \
-            time_t when;    \
-            int interval;   \
-        } c;    \
-        struct  /* Timer watchers, time in milliseconds */\
-        {   \
-            int timeout;    \
-            int period; \
-        } t;    \
-    } u;    \
+#define uev_private_st                                    \
+    struct uev_st *next, *prev;                           \
+    int active;                                           \
+    int events;                                           \
+    void (*cb)(struct uev_st *, void *, int);             \
+    void *args;                                           \
+    union /* Watcher type */                              \
+    {     /* Cron watchers */                             \
+        struct                                            \
+        {                                                 \
+            time_t when;                                  \
+            int interval;                                 \
+        } c;                                              \
+        struct /* Timer watchers, time in milliseconds */ \
+        {                                                 \
+            int timeout;                                  \
+            int period;                                   \
+        } t;                                              \
+    } u;                                                  \
     uev_type_t type;
 
-//事件
-struct uev_st {
-    uev_private_st //宏定义 private data for libuev internal engine
+// 事件
+struct uev_st
+{
+    uev_private_st // 宏定义 private data for libuev internal engine
 
-    //public data for users to reference
-    int signo;  //configured signal
-    int fd;     // active descriptor
-    struct uev_ctx_st *ctx;    // watcher context
+        // public data for users to reference
+        int signo;          // configured signal
+    int fd;                 // active descriptor
+    struct uev_ctx_st *ctx; // watcher context
 
     // Extra data for certain watcher types  TODO 这是干嘛
-    struct signalfd_siginfo siginfo;   //received signal
+    struct signalfd_siginfo siginfo; // received signal
 };
 
-#define MAX_EV_EVNETS (10)  //TODO 默认值，文件读取
+#define MAX_EV_EVNETS (10) // TODO 默认值，文件读取
 
-//TODO 下面的状态分别代表着什么
-#define UEV_NONE        0   //normal loop
-#define UEV_ERROR   EPOLLERR    //error flag
-#define UEV_READ    EPOLLIN     //poll for reading
-#define UEV_WRITE   EPOLLOUT    //poll for writing
-#define UEV_PRI     EPOLLPRI    //priority message
-#define UEV_HUP     EPOLLHUP    //hungup event
-#define UEV_RDHUP   EPOLLRDHUP  //peer shutdown
-#define UEV_EDGE    EPOLLET     //edge triiggered   //为什么没有垂直触发
-#define UEV_ONESHOT EPOLLONESHOT    //one-shot event //这个是垂直触发吗
+// TODO 下面的状态分别代表着什么
+#define UEV_NONE 0               // normal loop
+#define UEV_ERROR EPOLLERR       // error flag
+#define UEV_READ EPOLLIN         // poll for reading
+#define UEV_WRITE EPOLLOUT       // poll for writing
+#define UEV_PRI EPOLLPRI         // priority message
+#define UEV_HUP EPOLLHUP         // hungup event
+#define UEV_RDHUP EPOLLRDHUP     // peer shutdown
+#define UEV_EDGE EPOLLET         // edge triiggered   //为什么没有垂直触发
+#define UEV_ONESHOT EPOLLONESHOT // one-shot event //这个是垂直触发吗
 
-//执行标志
-#define UEV_ONCE    1       // run loop once
-#define UEV_NONBLOCK    2   // exit if no event
+// 执行标志
+#define UEV_ONCE 1     // run loop once
+#define UEV_NONBLOCK 2 // exit if no event
 
-//检查 io watcher is active or stopped
+// 检查 io watcher is active or stopped
 #define uev_io_active(w) _uev_watcher_acitve(w)
 /** Check if signal watcher is active or stopped */
 #define uev_signal_active(w) _uev_watcher_active(w)
 /** Check if timer is active or stopped */
-#define uev_timer_active(w)  _uev_watcher_active(w)
+#define uev_timer_active(w) _uev_watcher_active(w)
 /** Check if cron timer watcher is active or stopped */
-#define uev_cron_active(w)   _uev_watcher_active(w)
+#define uev_cron_active(w) _uev_watcher_active(w)
 /** Check if event watcher is active or stopped */
-#define uev_event_active(w)  _uev_watcher_active(w)
+#define uev_event_active(w) _uev_watcher_active(w)
 
-//事件回调
-typedef void (uev_cb_t)(struct uev_st *w, void *args, int events);
+// 事件回调
+typedef void(uev_cb_t)(struct uev_st *w, void *args, int events);
 
-//事件处理上下文
+// 事件处理上下文
 int uev_init(struct uev_ctx_st *ctx);
-int uev_init1(struct uev_ctx_st *ctx, int max_events); //epoll使用(不过高版本也没用)
+int uev_init1(struct uev_ctx_st *ctx, int max_events); // epoll使用(不过高版本也没用)
 int uev_exit(struct uev_ctx_st *ctx);
 int uev_run(struct uev_ctx_st *ctx, int flag);
 
-//IO事件
+// IO事件
 int uev_io_init(struct uev_ctx_st *ctx, struct uev_st *w, uev_cb_t *cb, void *args, int fd, int events);
 int uev_io_set(struct uev_st *w, int fd, int events);
 int uev_io_start(struct uev_st *w);
 int uev_io_stop(struct uev_st *w);
 
-//定时器
+// 定时器
 int uev_timer_init(struct uev_ctx_st *ctx, struct uev_st *w, uev_cb_t *cb, void *args, int timeout, int period);
 int uev_timer_set(struct uev_st *w, int timeout, int period);
 int uev_timer_start(struct uev_st *w);
@@ -174,8 +179,8 @@ int uev_event_init(struct uev_ctx_st *ctx, struct uev_st *w, uev_cb_t *cb, void 
 int uev_event_post(struct uev_st *w);
 int uev_event_stop(struct uev_st *w);
 
-int _uev_watcher_init(struct uev_ctx_st *ctx, struct uev_st *w, 
-    uev_type_t type, uev_cb_t *cb, void * data, int fd, int events);
+int _uev_watcher_init(struct uev_ctx_st *ctx, struct uev_st *w,
+                      uev_type_t type, uev_cb_t *cb, void *data, int fd, int events);
 int _uev_watcher_active(struct uev_st *w);
 int _uev_watcher_start(struct uev_st *w);
 int _uev_watcher_stop(struct uev_st *w);

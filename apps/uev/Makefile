@@ -8,10 +8,10 @@ include $(ROOT_DIR)/BuildEnv.mk
 E_TARGET = uev
 
 # 编译选项
-CFLAGS += -g -O0	
+CFLAGS += -g -O0
 
 # 引用头文件
-CFLAGS += -I. 
+CFLAGS += -I.
 # 链接动态库
 EXTRA_LDFLAGS += -l_log -l_uev -l_conf
 

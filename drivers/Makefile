@@ -4,6 +4,6 @@ endif
 include $(ROOT_DIR)/BuildEnv.mk
 
 # 定义 ${OPTIONS_LIB_LOG}=y 最后变成 subdir-y += lib_log
-subdir-${OPTIONS_DRIVER_PACKET} += dr_packet
+subdir-${OPTIONS_DRIVER_WATCH_DOG} += watch_dog
 
 include $(ROOT_DIR)/Rules.make

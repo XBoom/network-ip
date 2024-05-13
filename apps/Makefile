@@ -5,6 +5,6 @@ include $(ROOT_DIR)/BuildEnv.mk
 
 # 定义 ${OPTIONS_APP_RCU}=y 最后变成 subdir-y
 subdir-${OPTIONS_APP_RCU} += rcu
-subdir-${OPTIONS_APP_UEV} += rcu
+subdir-${OPTIONS_APP_UEV} += uev
 
 include $(ROOT_DIR)/Rules.make

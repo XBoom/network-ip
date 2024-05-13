@@ -1,0 +1,7 @@
+bench
+test
+.*.d
+*.o
+*~
+libuev.a
+libuev.so.1

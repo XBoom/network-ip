@@ -72,4 +72,7 @@ MSG_OUTPUT_DIR := $(PROTO_SRC_DIR)/msg/
 # 这里的 $< 会展开为 依赖项1.c。
 # endif
 
+#内核编译版本
+KERNEL_ROOT:=$(ROOT_DIR)/kernel/
+OS_KERNEL_VERSION:=$(KERNEL_ROOT)/$(KERNEL_VERSION)
 

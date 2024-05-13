@@ -27,7 +27,7 @@ $(subdir-list) : dummy
 	make -C $(patsubst _subdir_%,%,$@)
 endif
 
-all_targets: $(SO_TARGET) $(E_TARGET)
+all_targets: $(SO_TARGET) $(KO_TARGET) $(E_TARGET) 
 
 #============ 编译共享库 start ===================
 ifdef SO_TARGET
@@ -57,6 +57,19 @@ endif
 #	cp $(SO_TARGET) $(PREFIX_LIB)/$(BUILD_LIBS_SUBDIR)
 # endif
 #============ 编译共享库 end ===================
+
+#============ 编译内核模块 start ===================
+ifdef KO_TARGET
+CFLAGS=
+LDFLAGS=
+KO_TARGET: 
+	make -C $(OS_KERNEL_VERSION) M=$(shell pwd) modules
+	mkdir -p $(PACKET_ROOT)$(PREFIX_MODULE)
+	CP $(KO_TARGET) $(PACKET_ROOT)$(PREFIX_MODULE)
+$(KO_TARGET): KO_TARGET
+endif
+
+#============ 编译内核模块 end ===================
 
 #============ 编译进程 start ===================
 ifdef E_TARGET

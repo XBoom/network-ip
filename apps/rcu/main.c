@@ -1,5 +1,6 @@
 #include "common.h"
 #include "person.pb-c.h"
+#include "info.h"
 
 static void show_log()
 {
@@ -26,7 +27,9 @@ static void show_log()
 
 int main(int argc, char *argv[])
 {
-    struct Person p = PERSON__INIT;
-    LOG_INFO("proto person id %d", p.id);
+    Person p = PERSON__INIT;
+    student stu = {0};
+
+    LOG_INFO("proto person id %d %d", p.id, stu.age);
     show_log();
 }
