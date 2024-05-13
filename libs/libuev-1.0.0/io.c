@@ -25,7 +25,6 @@
 
 #include "uev.h"
 
-
 /**
  * Create an I/O watcher
  * @param ctx     A valid libuev context

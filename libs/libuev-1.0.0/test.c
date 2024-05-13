@@ -26,13 +26,14 @@
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>		/* intptr_t */
+#include <unistd.h> /* intptr_t */
 
 #include "uev.h"
 
-#define UNUSED(arg) arg __attribute__ ((unused))
+#define UNUSED(arg) arg __attribute__((unused))
 
-typedef struct {
+typedef struct
+{
 	int counter;
 } my_t;
 
@@ -71,26 +72,27 @@ static void pipe_read_cb(uev_ctx_t *UNUSED(ctx), uev_t UNUSED(*w), void UNUSED(*
 	int cnt;
 	char msg[50];
 
-        /* Kick watchdog */
+	/* Kick watchdog */
 	if (watchdog)
 		uev_timer_set(watchdog, 1000, 0);
 
 	cnt = read(in, msg, sizeof(msg));
-//	fprintf(stderr, "READ %.*s %d\n", cnt, msg, cnt);
+	//	fprintf(stderr, "READ %.*s %d\n", cnt, msg, cnt);
 	fprintf(stderr, "%.*s.%d ", cnt, msg, cnt);
 }
 
 static void pipe_write_cb(uev_ctx_t UNUSED(*ctx), uev_t *w, void *arg, int UNUSED(events))
 {
-	my_t *my  = arg;
+	my_t *my = arg;
 	char *msg = "TESTING";
 
-	if (write(out, msg, my->counter) < 0) {
-                perror("\nFailed writing to pipe");
-                return;
-        }
+	if (write(out, msg, my->counter) < 0)
+	{
+		perror("\nFailed writing to pipe");
+		return;
+	}
 
-//	fprintf(stderr, "WRITE %.*s %d\n", my->counter, msg, my->counter);
+	//	fprintf(stderr, "WRITE %.*s %d\n", my->counter, msg, my->counter);
 	fprintf(stderr, "%d ", my->counter);
 	period = my->counter + 5;
 	my->counter++;
@@ -101,7 +103,7 @@ static void pipe_write_cb(uev_ctx_t UNUSED(*ctx), uev_t *w, void *arg, int UNUSE
 int main(void)
 {
 	int fd[2];
-	my_t my = { .counter = 1 };
+	my_t my = {.counter = 1};
 	uev_t timeout, wdt, periodic, writer, reader, sigint_watcher, sigquit_watcher;
 	uev_ctx_t ctx;
 
@@ -122,7 +124,7 @@ int main(void)
 	uev_timer_init(&ctx, &timeout, lifetime_cb, (void *)(intptr_t)2, 4000, 0);
 
 	/* Main pipe worker and consumer */
-	in  = fd[0];
+	in = fd[0];
 	out = fd[1];
 	uev_io_init(&ctx, &reader, pipe_read_cb, NULL, in, UEV_READ);
 	uev_timer_init(&ctx, &writer, pipe_write_cb, &my, 400, 0);
@@ -141,7 +143,7 @@ int main(void)
 	fprintf(stderr, "Period is %d must be 10: %s\n", period, 10 == period ? "OK" : "ERROR!");
 	if (10 != period)
 		return 1;
-                
+
 	return 0;
 }
 

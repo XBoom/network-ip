@@ -26,10 +26,9 @@
 #include <errno.h>
 #include <signal.h>
 #include <sys/signalfd.h>
-#include <unistd.h>		/* close(), read() */
+#include <unistd.h> /* close(), read() */
 
 #include "uev.h"
-
 
 /**
  * Create a signal watcher
@@ -54,7 +53,8 @@ int uev_signal_init(uev_ctx_t *ctx, uev_t *w, uev_cb_t *cb, void *arg, int signo
 	if (uev_watcher_init(ctx, w, UEV_SIGNAL_TYPE, cb, arg, fd, UEV_READ))
 		goto exit;
 
-	if (uev_signal_set(w, signo)) {
+	if (uev_signal_set(w, signo))
+	{
 		uev_watcher_stop(w);
 	exit:
 		close(fd);
@@ -76,13 +76,15 @@ int uev_signal_set(uev_t *w, int signo)
 	sigset_t mask;
 
 	/* Every watcher must be registered to a context */
-	if (!w || !w->ctx) {
+	if (!w || !w->ctx)
+	{
 		errno = EINVAL;
 		return -1;
 	}
 
 	/* Handle stopped signal watchers */
-	if (w->fd < 0) {
+	if (w->fd < 0)
+	{
 		/* Remove from internal list */
 		LIST_REMOVE(w, link);
 

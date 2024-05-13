@@ -57,9 +57,10 @@
 
 #include "uev.h"
 
-#define UNUSED(arg) arg __attribute__ ((unused))
+#define UNUSED(arg) arg __attribute__((unused))
 
-typedef struct {
+typedef struct
+{
 	int index;
 } myarg_t;
 
@@ -76,17 +77,19 @@ static void read_cb(uev_ctx_t *UNUSED(ctx), uev_t *w, void *arg, int UNUSED(even
 	u_char ch;
 	myarg_t *m = arg;
 
-	idx  = m->index;
+	idx = m->index;
 	widx = idx + 1;
 	if (timers)
 		uev_timer_set(&evto[idx], 10000 + drand48() * 1000, 0);
 
 	count += read(w->fd, &ch, sizeof(ch));
-	if (writes) {
+	if (writes)
+	{
 		if (widx >= num_pipes)
 			widx -= num_pipes;
 
-		if (write(pipes[2 * widx + 1], "e", 1) < 0) {
+		if (write(pipes[2 * widx + 1], "e", 1) < 0)
+		{
 			perror("write()");
 			abort();
 		}
@@ -107,7 +110,8 @@ static struct timeval *run_once(uev_ctx_t *ctx)
 	static struct timeval ta, ts, te;
 
 	gettimeofday(&ta, NULL);
-	for (cp = pipes, i = 0; i < num_pipes; i++, cp += 2) {
+	for (cp = pipes, i = 0; i < num_pipes; i++, cp += 2)
+	{
 		uev_io_set(&evio[i], cp[0], UEV_READ);
 
 		if (timers)
@@ -119,8 +123,10 @@ static struct timeval *run_once(uev_ctx_t *ctx)
 	fired = 0;
 	space = num_pipes / num_active;
 	space = space * 2;
-	for (i = 0; i < num_active; i++, fired++) {
-		if (write(pipes[i * space + 1], "e", 1) < 0) {
+	for (i = 0; i < num_active; i++, fired++)
+	{
+		if (write(pipes[i * space + 1], "e", 1) < 0)
+		{
 			perror("write()");
 			abort();
 		}
@@ -133,21 +139,22 @@ static struct timeval *run_once(uev_ctx_t *ctx)
 
 		gettimeofday(&ts, NULL);
 
-		do {
+		do
+		{
 			uev_run(ctx, UEV_ONCE | UEV_NONBLOCK);
 			xcount++;
 		} while (count != fired);
 
 		gettimeofday(&te, NULL);
 
-//		if (xcount != count) fprintf(stderr, "Xcount: %d, Rcount: %d\n", xcount, count);
+		//		if (xcount != count) fprintf(stderr, "Xcount: %d, Rcount: %d\n", xcount, count);
 	}
 
 	timersub(&te, &ta, &ta);
 	timersub(&te, &ts, &ts);
 	fprintf(stdout, "%8ld %8ld\n",
-		ta.tv_sec * 1000000L + ta.tv_usec,
-		ts.tv_sec * 1000000L + ts.tv_usec);
+			ta.tv_sec * 1000000L + ta.tv_usec,
+			ts.tv_sec * 1000000L + ts.tv_usec);
 
 	return &te;
 }
@@ -163,8 +170,10 @@ int main(int argc, char **argv)
 	num_pipes = 100;
 	num_active = 1;
 	num_writes = num_pipes;
-	while ((c = getopt(argc, argv, "a:n:tw:")) != -1) {
-		switch (c) {
+	while ((c = getopt(argc, argv, "a:n:tw:")) != -1)
+	{
+		switch (c)
+		{
 		case 'a':
 			num_active = atoi(optarg);
 			break;
@@ -188,32 +197,37 @@ int main(int argc, char **argv)
 	}
 
 	rl.rlim_cur = rl.rlim_max = num_pipes * 3 + 50;
-	if (setrlimit(RLIMIT_NOFILE, &rl) == -1) {
+	if (setrlimit(RLIMIT_NOFILE, &rl) == -1)
+	{
 		perror("setrlimit");
 		return 1;
 	}
 
-	args   = calloc(num_pipes, sizeof(myarg_t));
-	evio   = calloc(num_pipes, sizeof(uev_t));
-	evto   = calloc(num_pipes, sizeof(uev_t));
-	pipes  = calloc(num_pipes * 2, sizeof(int));
-	if (!args || !evio || !evto || !pipes) {
+	args = calloc(num_pipes, sizeof(myarg_t));
+	evio = calloc(num_pipes, sizeof(uev_t));
+	evto = calloc(num_pipes, sizeof(uev_t));
+	pipes = calloc(num_pipes * 2, sizeof(int));
+	if (!args || !evio || !evto || !pipes)
+	{
 		perror("calloc");
 		return 1;
 	}
 
 	uev_init(&ctx);
 
-	for (cp = pipes, i = 0; i < num_pipes; i++, cp += 2) {
+	for (cp = pipes, i = 0; i < num_pipes; i++, cp += 2)
+	{
 		if (timers)
 			uev_timer_init(&ctx, &evto[i], timer_cb, NULL, 0, 0);
 		args[i].index = i;
 		uev_io_init(&ctx, &evio[i], read_cb, &args[i], -1, UEV_READ);
 
 #ifdef USE_PIPES
-		if (pipe(cp) == -1) {
+		if (pipe(cp) == -1)
+		{
 #else
-		if (socketpair(AF_UNIX, SOCK_STREAM, 0, cp) == -1) {
+		if (socketpair(AF_UNIX, SOCK_STREAM, 0, cp) == -1)
+		{
 #endif
 			perror("pipe");
 			exit(1);

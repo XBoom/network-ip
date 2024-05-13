@@ -24,29 +24,32 @@
  */
 
 #include <errno.h>
-#include <string.h>		/* memset() */
+#include <string.h> /* memset() */
 #include <sys/epoll.h>
-#include <sys/signalfd.h>	/* struct signalfd_siginfo */
-#include <unistd.h>		/* close(), read() */
+#include <sys/signalfd.h> /* struct signalfd_siginfo */
+#include <unistd.h>		  /* close(), read() */
 
 #include "uev.h"
 
-#define UNUSED(arg) arg __attribute__ ((unused))
+// 通过 __attribute__((unused)) 被明确标记为未使用，
+// 这样当使用 GCC 或支持此特性的编译器编译时，就不会因为未使用该参数而发出警告
+#define UNUSED(arg) arg __attribute__((unused))
 
-/* Private to libuev, do not use directly! */
+/* 事件观察者初始化 */
 int uev_watcher_init(uev_ctx_t *ctx, uev_t *w, uev_type_t type, uev_cb_t *cb, void *arg, int fd, int events)
 {
-	if (!ctx || !w) {
+	if (!ctx || !w)
+	{
 		errno = EINVAL;
 		return -1;
 	}
 
-	memset(w, 0, sizeof(*w));
-	w->ctx    = ctx;
-	w->fd     = fd;
-	w->type   = type;
-	w->cb     = (void *)cb;
-	w->arg    = arg;
+	memset(w, 0, sizeof(uev_t));
+	w->ctx = ctx;
+	w->fd = fd;
+	w->type = type;
+	w->cb = (void *)cb;
+	w->arg = arg;
 	w->events = events;
 
 	LIST_INSERT_HEAD(&w->ctx->watchers, w, link);
@@ -54,12 +57,13 @@ int uev_watcher_init(uev_ctx_t *ctx, uev_t *w, uev_type_t type, uev_cb_t *cb, vo
 	return 0;
 }
 
-/* Private to libuev, do not use directly! */
+/* 事件观察者 开始监听事件(添加到epoll中)*/
 int uev_watcher_start(uev_t *w)
 {
 	struct epoll_event ev;
 
-	if (!w || w->fd < 0) {
+	if (!w || w->fd < 0)
+	{
 		errno = EINVAL;
 		return -1;
 	}
@@ -67,7 +71,7 @@ int uev_watcher_start(uev_t *w)
 	if (w->active)
 		return 0;
 
-	ev.events   = w->events;
+	ev.events = w->events;
 	ev.data.ptr = w;
 	if (epoll_ctl(w->ctx->fd, EPOLL_CTL_ADD, w->fd, &ev) < 0)
 		return -1;
@@ -77,10 +81,11 @@ int uev_watcher_start(uev_t *w)
 	return 0;
 }
 
-/* Private to libuev, do not use directly! */
+/* 事件观察者 停止观察某件事 */
 int uev_watcher_stop(uev_t *w)
 {
-	if (!w) {
+	if (!w)
+	{
 		errno = EINVAL;
 		return -1;
 	}
@@ -96,10 +101,7 @@ int uev_watcher_stop(uev_t *w)
 }
 
 /**
- * Create an event loop context
- * @param ctx  Pointer to an uev_ctx_t context to be initialized
- *
- * @return POSIX OK(0) on success, or non-zero on error.
+ * @brief 初始化事件上下文(创建epoll、初始化观察者链表)
  */
 int uev_init(uev_ctx_t *ctx)
 {
@@ -117,19 +119,18 @@ int uev_init(uev_ctx_t *ctx)
 }
 
 /**
- * Terminate the event loop
- * @param ctx  A valid libuev context
- *
- * @return POSIX OK(0) or non-zero with @param errno set on error.
+ * @brief 事件
  */
 int uev_exit(uev_ctx_t *ctx)
 {
-	if (!ctx) {
+	if (!ctx)
+	{
 		errno = EINVAL;
 		return -1;
 	}
 
-	while (!LIST_EMPTY(&ctx->watchers)) {
+	while (!LIST_EMPTY(&ctx->watchers))
+	{
 		uev_t *w = LIST_FIRST(&ctx->watchers);
 
 		/* Remove from internal list */
@@ -138,7 +139,8 @@ int uev_exit(uev_ctx_t *ctx)
 		if (!w->active)
 			continue;
 
-		switch (w->type) {
+		switch (w->type)
+		{
 		case UEV_TIMER_TYPE:
 			uev_timer_stop(w);
 			break;
@@ -172,9 +174,10 @@ int uev_run(uev_ctx_t *ctx, int flags)
 	int result = 0, timeout = -1;
 	uev_t *w;
 
-        if (!ctx || ctx->fd < 0) {
+	if (!ctx || ctx->fd < 0)
+	{
 		errno = EINVAL;
-                return -1;
+		return -1;
 	}
 
 	if (flags & UEV_NONBLOCK)
@@ -184,16 +187,19 @@ int uev_run(uev_ctx_t *ctx, int flags)
 	ctx->running = 1;
 
 	/* Start all dormant timers */
-	LIST_FOREACH(w, &ctx->watchers, link) {
+	LIST_FOREACH(w, &ctx->watchers, link)
+	{
 		if (UEV_TIMER_TYPE == w->type)
 			uev_timer_set(w, w->timeout, w->period);
 	}
 
-	while (ctx->running) {
+	while (ctx->running)
+	{
 		int i, nfds;
 		struct epoll_event events[UEV_MAX_EVENTS];
 
-		while ((nfds = epoll_wait(ctx->fd, events, UEV_MAX_EVENTS, timeout)) < 0) {
+		while ((nfds = epoll_wait(ctx->fd, events, UEV_MAX_EVENTS, timeout)) < 0)
+		{
 			if (!ctx->running)
 				break;
 
@@ -205,10 +211,12 @@ int uev_run(uev_ctx_t *ctx, int flags)
 			break;
 		}
 
-		for (i = 0; ctx->running && i < nfds; i++) {
+		for (i = 0; ctx->running && i < nfds; i++)
+		{
 			w = (uev_t *)events[i].data.ptr;
 
-			if (UEV_TIMER_TYPE == w->type) {
+			if (UEV_TIMER_TYPE == w->type)
+			{
 				uint64_t exp;
 
 				if (read(w->fd, &exp, sizeof(exp)) != sizeof(exp))
@@ -218,7 +226,8 @@ int uev_run(uev_ctx_t *ctx, int flags)
 					w->timeout = 0;
 			}
 
-			if (UEV_SIGNAL_TYPE == w->type) {
+			if (UEV_SIGNAL_TYPE == w->type)
+			{
 				struct signalfd_siginfo fdsi;
 				ssize_t sz = sizeof(fdsi);
 
@@ -231,7 +240,8 @@ int uev_run(uev_ctx_t *ctx, int flags)
 			if (w->cb)
 				w->cb((struct uev *)ctx, w, w->arg);
 
-			if (UEV_TIMER_TYPE == w->type) {
+			if (UEV_TIMER_TYPE == w->type)
+			{
 				if (!w->timeout)
 					uev_timer_stop(w);
 			}
@@ -243,7 +253,6 @@ int uev_run(uev_ctx_t *ctx, int flags)
 
 	return result;
 }
-
 
 /**
  * Local Variables:
