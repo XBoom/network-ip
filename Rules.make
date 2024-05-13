@@ -1,6 +1,7 @@
 # 此文件用来在多个Makefile之间共享规则
 
 # 1. 根据语言设置编译命令
+# 如果 VARIABLE 的值等于 value，执行这里的命令
 ifeq ($(PREFIX_CC),)
 ifeq ($(wildcard *.cpp *.cc),)
     PREFIX_CC=$(CC)
@@ -36,7 +37,6 @@ ifdef SO_TARGET
 CFLAGS += -fPIC
 
 $(SO_TARGET): $(obj-y)
-	-rm -f $@
 	$(PREFIX_CC) -shared -o $@ $(filter $(obj-y), $^) $(LDFLAGS) $(EXTRA_LDFLAGS)
 
 #设置默认目标，在执行 make 之后会自动执行
