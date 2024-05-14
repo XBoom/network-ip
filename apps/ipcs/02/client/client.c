@@ -1,7 +1,7 @@
 #include "fifo.h"
 #include "request.pb-c.h"
 
-#define CLIENT_FIFO_CLIENT_PATH "./client/%d/send"
+#define CLIENT_FIFO_CLIENT_PATH "./client/send"
 
 int main(int argc, char *argv[])
 {
@@ -10,20 +10,15 @@ int main(int argc, char *argv[])
     int ret = 0;
     int status = 0;
 
-    // 1. 根据当前进程 id 设置管道路径
-    char fifo_path[1024] = {0};
-    sprintf(fifo_path, CLIENT_FIFO_CLIENT_PATH, (int)getpid());
-    LOG_INFO("fifo_path:%s", fifo_path);
-
-    // 2. 构建管道
-    ret = mkfifo(fifo_path, USR_WRITE); // 写权限
+    // 1. 构建管道
+    ret = mkfifo(CLIENT_FIFO_CLIENT_PATH, USR_WRITE); // 写权限
     if (ret < 0)
     {
         LOG_ERROR("mkfifo failed: %s", strerror(errno));
         return -1;
     }
 
-    // 3. 构建子进程
+    // 2. 构建子进程
     int child_pid = fork();
     CHECK_RET(child_pid < 0, "fork failed");
     if (child_pid == 0)
