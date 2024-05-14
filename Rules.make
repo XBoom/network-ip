@@ -95,6 +95,7 @@ clean-subdirs := $(clean-dirs) dummy
 clean: NOTMKDEP=1
 clean: $(clean-subdirs)
 	-rm -rf $(obj-y:.o=.d) $(obj-y) $(obj-m:.o=.d) $(obj-m) $(E_TARGET) $(SO_TARGET) $(L_TARGET) $(KO_TARGET) obj $(clean-files) *.d *.o *.gcda *.gcno *.bdf xtest/*.o xtest/*.gcda xtest/*.gcno
+	-rm -rf $(CLEAN_OBJ)
 
 #============ 清理所有目标 start ===================
 

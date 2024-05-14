@@ -62,8 +62,13 @@ typedef struct
 	watchers;
 } uev_ctx_t;
 
+typedef struct uev uev_t; // 向前声明
+
+/* Generic callback for watchers */
+typedef void(uev_cb_t)(uev_ctx_t *ctx, uev_t *w, void *arg, int events);
+
 /* I/O 事件 */
-typedef struct uev
+struct uev
 {
 	LIST_ENTRY(uev)
 	link; /* 链表 */
@@ -76,7 +81,7 @@ typedef struct uev
 	int events;		 // 事件
 
 	/* 观察者回调以及参数 */
-	void (*cb)(struct uev *, struct uev *, void *);
+	uev_cb_t *cb;
 	void *arg;
 
 	/* 定时器 时间单位毫秒 */
@@ -85,10 +90,7 @@ typedef struct uev
 
 	/* 关注的信号 */
 	int signo;
-} uev_t;
-
-/* Generic callback for watchers */
-typedef void(uev_cb_t)(uev_ctx_t *ctx, uev_t *w, void *arg, int events);
+};
 
 /* Private methods, do not use directly! */
 int uev_watcher_init(uev_ctx_t *ctx, uev_t *w, uev_type_t type, uev_cb_t *cb, void *arg, int fd, int events);

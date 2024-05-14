@@ -45,14 +45,23 @@ int uev_signal_init(uev_ctx_t *ctx, uev_t *w, uev_cb_t *cb, void *arg, int signo
 	int fd;
 	sigset_t mask;
 
+	/**
+	 * @brief 初始化一个信号集 mask
+	 * 尝试创建一个文件描述符 fd，用于接收信号。
+	 * 第一个参数 -1 表示从当前进程继承其信号掩码。
+	 * 第二个参数 &mask 是一个指向信号集的指针，指定了 signalfd 应该监控的信号。
+	 * 第三个参数 SFD_NONBLOCK 使得 signalfd 创建的文件描述符以非阻塞方式打开
+	 * */
 	sigemptyset(&mask);
 	fd = signalfd(-1, &mask, SFD_NONBLOCK);
 	if (fd < 0)
 		return -1;
 
+	// 初始化事件
 	if (uev_watcher_init(ctx, w, UEV_SIGNAL_TYPE, cb, arg, fd, UEV_READ))
 		goto exit;
 
+	// 开启监听信号
 	if (uev_signal_set(w, signo))
 	{
 		uev_watcher_stop(w);

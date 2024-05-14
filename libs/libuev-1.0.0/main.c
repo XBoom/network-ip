@@ -238,7 +238,7 @@ int uev_run(uev_ctx_t *ctx, int flags)
 			}
 
 			if (w->cb)
-				w->cb((struct uev *)ctx, w, w->arg);
+				w->cb(ctx, w, w->arg, w->events);
 
 			if (UEV_TIMER_TYPE == w->type)
 			{

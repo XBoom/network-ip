@@ -47,7 +47,7 @@ static void lifetime_cb(uev_ctx_t *ctx, uev_t UNUSED(*w), void *arg, int UNUSED(
 	uev_exit(ctx);
 }
 
-/* The pipe watchdog, if it triggers we haven't received data in time. */
+// 超时处理
 static void timeout_cb(uev_ctx_t *ctx, uev_t *w, void *arg, int UNUSED(events))
 {
 	watchdog = NULL;
@@ -57,16 +57,19 @@ static void timeout_cb(uev_ctx_t *ctx, uev_t *w, void *arg, int UNUSED(events))
 	uev_exit(ctx);
 }
 
+// 定时任务(执行多次)
 static void periodic_task(uev_ctx_t UNUSED(*ctx), uev_t UNUSED(*w), void UNUSED(*arg), int UNUSED(events))
 {
 	fprintf(stderr, "|");
 }
 
+// 信号处理逻辑
 static void signal_cb(uev_ctx_t *UNUSED(ctx), uev_t *w, void *UNUSED(arg), int UNUSED(events))
 {
 	fprintf(stderr, w->signo == SIGINT ? "^Cv" : "^\v");
 }
 
+// 管道读
 static void pipe_read_cb(uev_ctx_t *UNUSED(ctx), uev_t UNUSED(*w), void UNUSED(*arg), int UNUSED(events))
 {
 	int cnt;
@@ -81,6 +84,7 @@ static void pipe_read_cb(uev_ctx_t *UNUSED(ctx), uev_t UNUSED(*w), void UNUSED(*
 	fprintf(stderr, "%.*s.%d ", cnt, msg, cnt);
 }
 
+// 管道写
 static void pipe_write_cb(uev_ctx_t UNUSED(*ctx), uev_t *w, void *arg, int UNUSED(events))
 {
 	my_t *my = arg;
@@ -104,26 +108,26 @@ int main(void)
 {
 	int fd[2];
 	my_t my = {.counter = 1};
+	// 各种事件
 	uev_t timeout, wdt, periodic, writer, reader, sigint_watcher, sigquit_watcher;
 	uev_ctx_t ctx;
 
-	/* Work load, one timer callback writes to a pipe periodically,
-	 * and one I/O watcher that is called every time the pipe has
-	 * some data. */
+	// 构建一个管道
 	if (pipe(fd) < 0)
 		return 1;
 
-	/*  */
+	/* 初始化事件 */
 	uev_init(&ctx);
 
 	/* Signal watchers, Ctrl-C => SIGINT, Ctrl-\ => SIGQUIT */
+	// 添加信号事件
 	uev_signal_init(&ctx, &sigint_watcher, signal_cb, NULL, SIGINT);
 	uev_signal_init(&ctx, &sigquit_watcher, signal_cb, NULL, SIGQUIT);
 
-	/* Total program execution time */
+	/* 定时器 */
 	uev_timer_init(&ctx, &timeout, lifetime_cb, (void *)(intptr_t)2, 4000, 0);
 
-	/* Main pipe worker and consumer */
+	/* 管道读写*/
 	in = fd[0];
 	out = fd[1];
 	uev_io_init(&ctx, &reader, pipe_read_cb, NULL, in, UEV_READ);
@@ -134,10 +138,10 @@ int main(void)
 	uev_timer_init(&ctx, &wdt, timeout_cb, (void *)(intptr_t)1, 950, 0);
 	watchdog = &wdt;
 
-	/* Periodic background task */
+	/*定时器任务*/
 	uev_timer_init(&ctx, &periodic, periodic_task, NULL, 200, 200);
 
-	/* Start event loop */
+	/* 开始事件循环 */
 	uev_run(&ctx, 0);
 
 	fprintf(stderr, "Period is %d must be 10: %s\n", period, 10 == period ? "OK" : "ERROR!");

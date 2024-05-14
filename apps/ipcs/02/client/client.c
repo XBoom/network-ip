@@ -13,10 +13,15 @@ int main(int argc, char *argv[])
     // 1. 根据当前进程 id 设置管道路径
     char fifo_path[1024] = {0};
     sprintf(fifo_path, CLIENT_FIFO_CLIENT_PATH, (int)getpid());
+    LOG_INFO("fifo_path:%s", fifo_path);
 
     // 2. 构建管道
     ret = mkfifo(fifo_path, USR_WRITE); // 写权限
-    CHECK_RET(ret != 0, "mkfifo failed");
+    if (ret < 0)
+    {
+        LOG_ERROR("mkfifo failed: %s", strerror(errno));
+        return -1;
+    }
 
     // 3. 构建子进程
     int child_pid = fork();
@@ -54,7 +59,7 @@ int main(int argc, char *argv[])
 
     size_t packed_size = fifo_request__get_packed_size((const FifoRequest *)&request);
     uint8_t *packed_data = NULL;
-    packed_data = (uint8_t *)malloc(packed_size);
+    // packed_data = (uint8_t *)malloc(packed_size);
     fifo_request__pack(&request, packed_data);
 
     // 5. 打开服务端监听管理，把消息写进去
