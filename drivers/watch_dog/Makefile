@@ -3,9 +3,10 @@ export ROOT_DIR=$(shell while true; do if [ -f BuildEnv.mk ]; then pwd;exit; els
 endif
 include $(ROOT_DIR)/BuildEnv.mk
 
-KO_TARGET = dr_packet
+KO_TARGET = watch_dog.ko
 
-C__SOURCES := $(wildcard *.c)
-obj-y += $(C__SOURCES:%.c=%.o)
+EXTRA_CFLAGS +=
+
+obj-m += main.o
 
 include $(ROOT_DIR)/Rules.make

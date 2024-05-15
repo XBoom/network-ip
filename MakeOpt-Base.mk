@@ -13,3 +13,10 @@ OPTIONS_APP_UEV=y
 
 ## proto
 OPTIONS_INCLUDE_PROTO=y
+
+
+## 内核版本
+KERNEL_VERSION=linux-6.1.0
+## 内核驱动
+OPTIONS_DRIVER_WATCH_DOG=y
+

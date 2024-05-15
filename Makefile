@@ -1,16 +1,12 @@
 # 设置的当前目录
-export ROOT_DIR = $(shell pwd)
-# 引用编译默认参数
-include BuildEnv.mk
-
-# 设置编译信息
-export BUILD_DATE_TIME=$(shell date '+%Y-%m-%d %H:%M:%S' )
-export BUILD_DATE=$(shell date '+%y%m%d')
-export BUILDER_NAME=$(shell whoami)
+ifeq ($(ROOT_DIR),)
+export ROOT_DIR=$(shell while true; do if [ -f BuildEnv.mk ]; then pwd;exit; else cd ..;fi;done;)
+endif
+include $(ROOT_DIR)/BuildEnv.mk
 
 # 公共与子目录
 # DIRS = libs apps
-DIRS = include libs apps
+DIRS = include libs drivers apps
 # COMMON = include libs tools
 
 # 默认编译目标all

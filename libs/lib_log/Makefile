@@ -48,11 +48,7 @@ SO_TARGET = lib_log.so
 # 	$(CC) $(CFLAGS) -c $< -o $@
 
 C__SOURCES := $(wildcard *.c)
-CPPSOURCES := $(wildcard *.cpp)
-CXXSOURCES := $(wildcard *.cc)
 
 obj-y += $(C__SOURCES:%.c=%.o)
-obj-y += $(CPPSOURCES:%.cpp=%.o)
-obj-y += $(CXXSOURCES:%.cc=%.o)
 
 include $(ROOT_DIR)/Rules.make

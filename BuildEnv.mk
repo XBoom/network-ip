@@ -21,9 +21,6 @@ CFLAGS += -I$(PROTO_MSG)
 
 PROTO_SRC := $(ROOT_DIR)/include/proto/
 
-# 编译目标
-SO_TARGET := 
-
 #共享库在编译的时候移动到指定的目录，方便运行的时候能够找到共享库
 PROCESS_LIBS := /home/libs/
 
@@ -72,4 +69,9 @@ MSG_OUTPUT_DIR := $(PROTO_SRC_DIR)/msg/
 # 这里的 $< 会展开为 依赖项1.c。
 # endif
 
+#内核编译版本
+KERNEL_ROOT:=$(ROOT_DIR)/kernel/
+OS_KERNEL_VERSION:=$(KERNEL_ROOT)/$(KERNEL_VERSION)
 
+# 清理对象(有时候需要单独清理的内容)
+CLEAN_OBJ:=

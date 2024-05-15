@@ -1,6 +1,7 @@
 # 此文件用来在多个Makefile之间共享规则
 
 # 1. 根据语言设置编译命令
+# 如果 VARIABLE 的值等于 value，执行这里的命令
 ifeq ($(PREFIX_CC),)
 ifeq ($(wildcard *.cpp *.cc),)
     PREFIX_CC=$(CC)
@@ -27,7 +28,7 @@ $(subdir-list) : dummy
 	make -C $(patsubst _subdir_%,%,$@)
 endif
 
-all_targets: $(SO_TARGET) $(E_TARGET)
+all_targets: $(SO_TARGET) $(KO_TARGET) $(E_TARGET) 
 
 #============ 编译共享库 start ===================
 ifdef SO_TARGET
@@ -36,7 +37,6 @@ ifdef SO_TARGET
 CFLAGS += -fPIC
 
 $(SO_TARGET): $(obj-y)
-	-rm -f $@
 	$(PREFIX_CC) -shared -o $@ $(filter $(obj-y), $^) $(LDFLAGS) $(EXTRA_LDFLAGS)
 
 #设置默认目标，在执行 make 之后会自动执行
@@ -57,6 +57,19 @@ endif
 #	cp $(SO_TARGET) $(PREFIX_LIB)/$(BUILD_LIBS_SUBDIR)
 # endif
 #============ 编译共享库 end ===================
+
+#============ 编译内核模块 start ===================
+ifdef KO_TARGET
+CFLAGS=
+LDFLAGS=
+KO_TARGET: 
+	make -C $(OS_KERNEL_VERSION) M=$(shell pwd) modules
+	mkdir -p $(PACKET_ROOT)$(PREFIX_MODULE)
+	CP $(KO_TARGET) $(PACKET_ROOT)$(PREFIX_MODULE)
+$(KO_TARGET): KO_TARGET
+endif
+
+#============ 编译内核模块 end ===================
 
 #============ 编译进程 start ===================
 ifdef E_TARGET
@@ -82,6 +95,7 @@ clean-subdirs := $(clean-dirs) dummy
 clean: NOTMKDEP=1
 clean: $(clean-subdirs)
 	-rm -rf $(obj-y:.o=.d) $(obj-y) $(obj-m:.o=.d) $(obj-m) $(E_TARGET) $(SO_TARGET) $(L_TARGET) $(KO_TARGET) obj $(clean-files) *.d *.o *.gcda *.gcno *.bdf xtest/*.o xtest/*.gcda xtest/*.gcno
+	-rm -rf $(CLEAN_OBJ)
 
 #============ 清理所有目标 start ===================
 

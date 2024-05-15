@@ -40,13 +40,16 @@ int uev_timer_init(struct uev_ctx_st *ctx, struct uev_st *w, uev_cb_t *cb, void 
      *      TFD_NONBLOCK: 将定时器描述符设置为非阻塞模式。
      *      TFD_CLOEXEC: 在 exec 调用中关闭定时器描述符
      */
+    // 创建一个系统定时器
     fd = timerfd_create(CLOCK_MONOTONIC, TFD_NONBLOCK | TFD_CLOEXEC);
     if (fd < 0)
         return -1;
 
+    // 构建uev事件(其实就像是将参数写入w)
     if (_uev_watcher_init(ctx, w, UEV_TIMER_TYPE, cb, args, fd, UEV_READ))
         goto exit;
 
+    // 开启
     if (uev_timer_set(w, timeout, period))
     {
         _uev_watcher_stop(w);
