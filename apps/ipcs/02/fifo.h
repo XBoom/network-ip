@@ -5,8 +5,9 @@
 
 #define MSG_MAX_LEN (1024)
 #define MAX_FIFO_PATH_LEN (20)
-#define SERVER_FIFO_PATH_NAME "client_fifo_file"
-#define CLIENT_FIFO_PATH_NAME "server_fifo_file"
+#define SERVER_FIFO_PATH_NAME "server_fifo_file"
+#define CLIENT_FIFO_PATH_NAME "client_fifo_file"
+#define FIFO_CLIENT_PATH_FMT "./%s_%d"
 
 // 表示文件所有者具有读写权限，所属组和其他用户只有读权限
 #define FILE_MODE (S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)
