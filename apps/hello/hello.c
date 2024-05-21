@@ -36,6 +36,9 @@ typedef struct demo4
     uint8_t a;  // 1
     uint32_t b; // 4
     uint16_t c; // 2
+    uint8_t d;  // 1
+    uint32_t e; // 4
+    uint16_t f; // 2
 } demo4;
 
 typedef struct demo5
@@ -43,6 +46,9 @@ typedef struct demo5
     uint8_t a;  // 1
     uint16_t c; // 2
     uint32_t b; // 4
+    uint8_t d;  // 1
+    uint16_t e; // 2
+    uint32_t f; // 4
 } demo5;
 
 typedef struct demo6
@@ -50,10 +56,14 @@ typedef struct demo6
     uint32_t b; // 4
     uint16_t c; // 2
     uint8_t a;  // 1
+    uint32_t d; // 4
+    uint16_t e; // 2
+    uint8_t f;  // 1
 } demo6;
 
 int main(int argc, char *argv[])
 {
     printf("%d %d %d", (int)sizeof(demo1), (int)sizeof(demo2), (int)sizeof(demo3));
+    printf("%d %d %d", (int)sizeof(demo4), (int)sizeof(demo5), (int)sizeof(demo6));
     return 0;
 }
